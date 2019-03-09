@@ -1,12 +1,2 @@
-//
-//  main.swift
-//  Monkey
-//
-//  Created by Rod Schmidt on 3/2/19.
-//  Copyright © 2019 infiniteNIL. All rights reserved.
-//
-
-import Foundation
-
-print("Hello, World!")
-
+print("Monkey programming language")
+startREPL()

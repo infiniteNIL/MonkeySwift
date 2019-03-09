@@ -3,12 +3,42 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		DC5DFB0D222B61680065253A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB0C222B61680065253A /* main.swift */; };
+		DC5DFB14222B61980065253A /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB13222B61980065253A /* Repl.swift */; };
+		DC5DFB1E222B62260065253A /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB18222B62250065253A /* Lexer.swift */; };
+		DC5DFB1F222B62260065253A /* Evaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB19222B62260065253A /* Evaluator.swift */; };
+		DC5DFB20222B62260065253A /* AST.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1A222B62260065253A /* AST.swift */; };
+		DC5DFB21222B62260065253A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1B222B62260065253A /* Parser.swift */; };
+		DC5DFB22222B62260065253A /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1C222B62260065253A /* Object.swift */; };
+		DC5DFB23222B62260065253A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1D222B62260065253A /* Token.swift */; };
+		DC5DFB9C222B98430065253A /* MonkeyLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5DFB93222B98420065253A /* MonkeyLib.framework */; };
+		DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFBA0222B98430065253A /* MonkeyLibTests.swift */; };
+		DC5DFBA3222B98430065253A /* MonkeyLib.h in Headers */ = {isa = PBXBuildFile; fileRef = DC5DFB95222B98420065253A /* MonkeyLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DC5DFBAA222B98600065253A /* ASTTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB25222B624C0065253A /* ASTTests.swift */; };
+		DC5DFBAB222B98600065253A /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB28222B624C0065253A /* ParserTests.swift */; };
+		DC5DFBAC222B98600065253A /* LexerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB29222B624C0065253A /* LexerTests.swift */; };
+		DC5DFBAD222B98600065253A /* EvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB2A222B624C0065253A /* EvaluatorTests.swift */; };
+		DC5DFBAE222B98670065253A /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB18222B62250065253A /* Lexer.swift */; };
+		DC5DFBAF222B98670065253A /* Evaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB19222B62260065253A /* Evaluator.swift */; };
+		DC5DFBB0222B98670065253A /* AST.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1A222B62260065253A /* AST.swift */; };
+		DC5DFBB1222B98670065253A /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1B222B62260065253A /* Parser.swift */; };
+		DC5DFBB2222B98670065253A /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1C222B62260065253A /* Object.swift */; };
+		DC5DFBB3222B98670065253A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1D222B62260065253A /* Token.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DC5DFB9D222B98430065253A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC5DFB01222B61680065253A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC5DFB92222B98420065253A;
+			remoteInfo = MonkeyLib;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		DC5DFB07222B61680065253A /* CopyFiles */ = {
@@ -25,6 +55,24 @@
 /* Begin PBXFileReference section */
 		DC5DFB09222B61680065253A /* Monkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Monkey; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC5DFB0C222B61680065253A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		DC5DFB13222B61980065253A /* Repl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
+		DC5DFB18222B62250065253A /* Lexer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
+		DC5DFB19222B62260065253A /* Evaluator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Evaluator.swift; sourceTree = "<group>"; };
+		DC5DFB1A222B62260065253A /* AST.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AST.swift; sourceTree = "<group>"; };
+		DC5DFB1B222B62260065253A /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		DC5DFB1C222B62260065253A /* Object.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
+		DC5DFB1D222B62260065253A /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		DC5DFB25222B624C0065253A /* ASTTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASTTests.swift; sourceTree = "<group>"; };
+		DC5DFB28222B624C0065253A /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
+		DC5DFB29222B624C0065253A /* LexerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexerTests.swift; sourceTree = "<group>"; };
+		DC5DFB2A222B624C0065253A /* EvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvaluatorTests.swift; sourceTree = "<group>"; };
+		DC5DFB73222B8CB80065253A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		DC5DFB93222B98420065253A /* MonkeyLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MonkeyLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC5DFB95222B98420065253A /* MonkeyLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MonkeyLib.h; sourceTree = "<group>"; };
+		DC5DFB96222B98420065253A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC5DFB9B222B98420065253A /* MonkeyLibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MonkeyLibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC5DFBA0222B98430065253A /* MonkeyLibTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonkeyLibTests.swift; sourceTree = "<group>"; };
+		DC5DFBA2222B98430065253A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +83,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DC5DFB90222B98420065253A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5DFB98222B98420065253A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC5DFB9C222B98430065253A /* MonkeyLib.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -42,7 +105,11 @@
 			isa = PBXGroup;
 			children = (
 				DC5DFB0B222B61680065253A /* Monkey */,
+				DC5DFB15222B61AC0065253A /* MonkeyLib */,
+				DC5DFB94222B98420065253A /* MonkeyLib */,
+				DC5DFB9F222B98430065253A /* MonkeyLibTests */,
 				DC5DFB0A222B61680065253A /* Products */,
+				DC5DFB72222B8CB80065253A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -50,6 +117,8 @@
 			isa = PBXGroup;
 			children = (
 				DC5DFB09222B61680065253A /* Monkey */,
+				DC5DFB93222B98420065253A /* MonkeyLib.framework */,
+				DC5DFB9B222B98420065253A /* MonkeyLibTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,11 +127,82 @@
 			isa = PBXGroup;
 			children = (
 				DC5DFB0C222B61680065253A /* main.swift */,
+				DC5DFB13222B61980065253A /* Repl.swift */,
 			);
 			path = Monkey;
 			sourceTree = "<group>";
 		};
+		DC5DFB15222B61AC0065253A /* MonkeyLib */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFB17222B62250065253A /* sources */,
+				DC5DFB24222B624C0065253A /* tests */,
+			);
+			path = MonkeyLib;
+			sourceTree = "<group>";
+		};
+		DC5DFB17222B62250065253A /* sources */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFB18222B62250065253A /* Lexer.swift */,
+				DC5DFB19222B62260065253A /* Evaluator.swift */,
+				DC5DFB1A222B62260065253A /* AST.swift */,
+				DC5DFB1B222B62260065253A /* Parser.swift */,
+				DC5DFB1C222B62260065253A /* Object.swift */,
+				DC5DFB1D222B62260065253A /* Token.swift */,
+			);
+			path = sources;
+			sourceTree = "<group>";
+		};
+		DC5DFB24222B624C0065253A /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFB25222B624C0065253A /* ASTTests.swift */,
+				DC5DFB28222B624C0065253A /* ParserTests.swift */,
+				DC5DFB29222B624C0065253A /* LexerTests.swift */,
+				DC5DFB2A222B624C0065253A /* EvaluatorTests.swift */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		DC5DFB72222B8CB80065253A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFB73222B8CB80065253A /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DC5DFB94222B98420065253A /* MonkeyLib */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFB95222B98420065253A /* MonkeyLib.h */,
+				DC5DFB96222B98420065253A /* Info.plist */,
+			);
+			path = MonkeyLib;
+			sourceTree = "<group>";
+		};
+		DC5DFB9F222B98430065253A /* MonkeyLibTests */ = {
+			isa = PBXGroup;
+			children = (
+				DC5DFBA0222B98430065253A /* MonkeyLibTests.swift */,
+				DC5DFBA2222B98430065253A /* Info.plist */,
+			);
+			path = MonkeyLibTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		DC5DFB8E222B98420065253A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC5DFBA3222B98430065253A /* MonkeyLib.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		DC5DFB08222B61680065253A /* Monkey */ = {
@@ -82,6 +222,42 @@
 			productReference = DC5DFB09222B61680065253A /* Monkey */;
 			productType = "com.apple.product-type.tool";
 		};
+		DC5DFB92222B98420065253A /* MonkeyLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC5DFBA4222B98430065253A /* Build configuration list for PBXNativeTarget "MonkeyLib" */;
+			buildPhases = (
+				DC5DFB8E222B98420065253A /* Headers */,
+				DC5DFB8F222B98420065253A /* Sources */,
+				DC5DFB90222B98420065253A /* Frameworks */,
+				DC5DFB91222B98420065253A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MonkeyLib;
+			productName = MonkeyLib;
+			productReference = DC5DFB93222B98420065253A /* MonkeyLib.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DC5DFB9A222B98420065253A /* MonkeyLibTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC5DFBA7222B98430065253A /* Build configuration list for PBXNativeTarget "MonkeyLibTests" */;
+			buildPhases = (
+				DC5DFB97222B98420065253A /* Sources */,
+				DC5DFB98222B98420065253A /* Frameworks */,
+				DC5DFB99222B98420065253A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC5DFB9E222B98430065253A /* PBXTargetDependency */,
+			);
+			name = MonkeyLibTests;
+			productName = MonkeyLibTests;
+			productReference = DC5DFB9B222B98420065253A /* MonkeyLibTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -95,10 +271,16 @@
 					DC5DFB08222B61680065253A = {
 						CreatedOnToolsVersion = 10.1;
 					};
+					DC5DFB92222B98420065253A = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					DC5DFB9A222B98420065253A = {
+						CreatedOnToolsVersion = 10.1;
+					};
 				};
 			};
 			buildConfigurationList = DC5DFB04222B61680065253A /* Build configuration list for PBXProject "Monkey" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -110,20 +292,79 @@
 			projectRoot = "";
 			targets = (
 				DC5DFB08222B61680065253A /* Monkey */,
+				DC5DFB92222B98420065253A /* MonkeyLib */,
+				DC5DFB9A222B98420065253A /* MonkeyLibTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DC5DFB91222B98420065253A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5DFB99222B98420065253A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DC5DFB05222B61680065253A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC5DFB14222B61980065253A /* Repl.swift in Sources */,
+				DC5DFB1F222B62260065253A /* Evaluator.swift in Sources */,
+				DC5DFB21222B62260065253A /* Parser.swift in Sources */,
+				DC5DFB22222B62260065253A /* Object.swift in Sources */,
+				DC5DFB1E222B62260065253A /* Lexer.swift in Sources */,
+				DC5DFB20222B62260065253A /* AST.swift in Sources */,
 				DC5DFB0D222B61680065253A /* main.swift in Sources */,
+				DC5DFB23222B62260065253A /* Token.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5DFB8F222B98420065253A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC5DFBB2222B98670065253A /* Object.swift in Sources */,
+				DC5DFBB1222B98670065253A /* Parser.swift in Sources */,
+				DC5DFBB0222B98670065253A /* AST.swift in Sources */,
+				DC5DFBB3222B98670065253A /* Token.swift in Sources */,
+				DC5DFBAE222B98670065253A /* Lexer.swift in Sources */,
+				DC5DFBAF222B98670065253A /* Evaluator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5DFB97222B98420065253A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC5DFBAA222B98600065253A /* ASTTests.swift in Sources */,
+				DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */,
+				DC5DFBAC222B98600065253A /* LexerTests.swift in Sources */,
+				DC5DFBAB222B98600065253A /* ParserTests.swift in Sources */,
+				DC5DFBAD222B98600065253A /* EvaluatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DC5DFB9E222B98430065253A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC5DFB92222B98420065253A /* MonkeyLib */;
+			targetProxy = DC5DFB9D222B98430065253A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		DC5DFB0E222B61680065253A /* Debug */ = {
@@ -261,6 +502,102 @@
 			};
 			name = Release;
 		};
+		DC5DFBA5222B98430065253A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = MB9RW2WD7P;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = MonkeyLib/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.infinitenil.MonkeyLib;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		DC5DFBA6222B98430065253A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = MB9RW2WD7P;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = MonkeyLib/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.infinitenil.MonkeyLib;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		DC5DFBA8222B98430065253A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MB9RW2WD7P;
+				INFOPLIST_FILE = MonkeyLibTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.infinitenil.MonkeyLibTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		DC5DFBA9222B98430065253A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MB9RW2WD7P;
+				INFOPLIST_FILE = MonkeyLibTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.infinitenil.MonkeyLibTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -278,6 +615,24 @@
 			buildConfigurations = (
 				DC5DFB11222B61680065253A /* Debug */,
 				DC5DFB12222B61680065253A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC5DFBA4222B98430065253A /* Build configuration list for PBXNativeTarget "MonkeyLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC5DFBA5222B98430065253A /* Debug */,
+				DC5DFBA6222B98430065253A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC5DFBA7222B98430065253A /* Build configuration list for PBXNativeTarget "MonkeyLibTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC5DFBA8222B98430065253A /* Debug */,
+				DC5DFBA9222B98430065253A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
