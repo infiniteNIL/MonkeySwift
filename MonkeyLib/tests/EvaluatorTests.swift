@@ -133,7 +133,7 @@ class EvaluatorTests: XCTestCase {
     func testReturnStatements() {
         struct Test {
             let input: String
-            let expected: Any?
+            let expected: Int
         }
 
         let tests: [Test] = [
@@ -146,12 +146,31 @@ class EvaluatorTests: XCTestCase {
 
         for t in tests {
             let evaluated = testEval(t.input)
-            if let expected = t.expected as? Int {
-                XCTAssertIntegerObject(evaluated, expected)
-            }
-            else {
-                XCTFail()
-            }
+            XCTAssertIntegerObject(evaluated, t.expected)
+        }
+    }
+
+    func testErrorHandling() {
+        struct Test {
+            let input: String
+            let expectedMessage: String
+        }
+
+        let tests: [Test] = [
+            Test(input: "5 + true;", expectedMessage: "type mismatch: INTEGER + BOOLEAN"),
+            Test(input: "5 + true; 5;", expectedMessage: "type mismatch: INTEGER + BOOLEAN"),
+            Test(input: "-true;", expectedMessage: "unknown operator: -BOOLEAN"),
+            Test(input: "true + false;", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
+            Test(input: "5; true + false; 5", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
+            Test(input: "if (10 > 1) { true + false }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
+            Test(input: "if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+            XCTAssertNotNil(evaluated as? ErrorValue, "No error object returned for input \(t.input). got \(String(describing: evaluated))")
+            guard let errObj = evaluated as? ErrorValue else { break }
+            XCTAssertEqual(errObj.message, t.expectedMessage, "wrong error message. expected=\(t.expectedMessage), got=\(errObj.message)")
         }
     }
 

@@ -12,6 +12,7 @@ public enum MonkeyObjectType: String {
     case booleanObj = "BOOLEAN"
     case nullObj = "NULL"
     case returnValueObj = "RETURN_VALUE"
+    case errorObj = "ERROR"
 }
 
 public protocol MonkeyObject {
@@ -77,6 +78,22 @@ extension ReturnValue: MonkeyObject {
 
     public func inspect() -> String {
         return "\(value)"
+    }
+
+}
+
+struct ErrorValue {
+    let message: String
+}
+
+extension ErrorValue: MonkeyObject {
+
+    public func type() -> MonkeyObjectType {
+        return .errorObj
+    }
+
+    public func inspect() -> String {
+        return "ERROR: " + message
     }
 
 }

@@ -24,6 +24,9 @@ public func eval(_ node: Node) -> MonkeyObject? {
         guard let node = node as? ReturnStatement else { return nil }
         guard let returnValue = node.returnValue else { return nil }
         guard let value = eval(returnValue) else { return nil }
+        if isError(value) {
+            return value
+        }
         return ReturnValue(value: value)
 
     case is Statement:
@@ -33,12 +36,18 @@ public func eval(_ node: Node) -> MonkeyObject? {
     case is PrefixExpression:
         guard let node = node as? PrefixExpression, node.right != nil else { return nil }
         guard let right = eval(node.right!) else { return nil }
+        if isError(right) {
+            return right
+        }
         return evalPrefixExpression(node.operator, right)
 
     case is InfixExpression:
         guard let node = node as? InfixExpression, node.right != nil else { return nil }
         guard let left = eval(node.left) else { return nil }
         guard let right = eval(node.right!) else { return nil }
+        if isError(right) {
+            return right
+        }
         return evalInfixExpression(node.operator, left, right)
 
     case is IfExpression:
@@ -64,8 +73,14 @@ private func evalProgram(_ program: Program) -> MonkeyObject? {
     for statement in program.statements {
         result = eval(statement)
 
-        if let returnValue = result as? ReturnValue {
-            return returnValue.value
+        switch result {
+        case is ReturnValue:
+            return (result as! ReturnValue).value
+
+        case is ErrorValue:
+            return result
+
+        default: break // nop
         }
     }
 
@@ -78,7 +93,7 @@ private func evalBlockStatement(_ block: BlockStatement) -> MonkeyObject? {
     for statement in block.statements {
         result = eval(statement)
 
-        if let result = result, result.type() == .returnValueObj {
+        if let result = result, result.type() == .returnValueObj  || result.type() == .errorObj {
             return result
         }
     }
@@ -95,7 +110,7 @@ private func evalPrefixExpression(_ op: String, _ right: MonkeyObject) -> Monkey
         return evalMinusPrefixOperatorExpression(right)
 
     default:
-        return Null
+        return newError(message: "unknown operator: \(op)\(right.type().rawValue)")
     }
 }
 
@@ -113,7 +128,7 @@ private func evalBangOperatorExpression(_ right: MonkeyObject) -> MonkeyObject {
 
 private func evalMinusPrefixOperatorExpression(_ right: MonkeyObject) -> MonkeyObject {
     if right.type() != .integerObj {
-        return Null
+        return newError(message: "unknown operator: -\(right.type().rawValue)")
     }
 
     let value = (right as! MonkeyInteger).value
@@ -134,11 +149,14 @@ private func evalInfixExpression(_ op: String, _ left: MonkeyObject, _ right: Mo
         switch op {
         case "==":  return nativeBoolToBooleanObject(left.value == right.value)
         case "!=":  return nativeBoolToBooleanObject(left.value != right.value)
-        default:    return Null
+        default:    return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
         }
     }
+    else if left.type() != right.type() {
+        return newError(message: "type mismatch: \(left.type().rawValue) \(op) \(right.type().rawValue)")
+    }
     else {
-        return Null
+        return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
     }
 }
 
@@ -155,12 +173,15 @@ private func evalIntegerInfixExpression(_ op: String, _ left: MonkeyObject, _ ri
     case "<":   return nativeBoolToBooleanObject(leftVal < rightVal)
     case "==":  return nativeBoolToBooleanObject(leftVal == rightVal)
     case "!=":  return nativeBoolToBooleanObject(leftVal != rightVal)
-    default:    return Null
+    default:    return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
     }
 }
 
 private func evalIfExpression(_ ie: IfExpression) -> MonkeyObject? {
     guard let condition = eval(ie.condition) else { return nil }
+    if isError(condition) {
+        return condition
+    }
 
     if isTruthy(condition) {
         return eval(ie.consequence)
@@ -183,4 +204,12 @@ private func isTruthy(_ object: MonkeyObject) -> Bool {
     else {
         return true
     }
+}
+
+private func newError(message: String) -> ErrorValue {
+    return ErrorValue(message: message)
+}
+
+private func isError(_ obj: MonkeyObject?) -> Bool {
+    return obj?.type() == .errorObj
 }
