@@ -11,31 +11,41 @@ public let True = MonkeyBoolean(value: true)
 public let False = MonkeyBoolean(value: false)
 public let Null = MonkeyNull()
 
-public func eval(_ node: Node) -> MonkeyObject? {
+public func eval(_ node: Node, _ env: inout Environment) -> MonkeyObject? {
     switch node {
     case is Program:
-        return evalProgram((node as! Program))
+        return evalProgram((node as! Program), &env)
 
     case is BlockStatement:
         guard let node = node as? BlockStatement else { return nil }
-        return evalBlockStatement(node)
+        return evalBlockStatement(node, &env)
 
     case is ReturnStatement:
         guard let node = node as? ReturnStatement else { return nil }
         guard let returnValue = node.returnValue else { return nil }
-        guard let value = eval(returnValue) else { return nil }
+        guard let value = eval(returnValue, &env) else { return nil }
         if isError(value) {
             return value
         }
         return ReturnValue(value: value)
 
+    case is LetStatement:
+        guard let node = node as? LetStatement else { return nil }
+        guard let value = node.value else { return nil }
+        let val = eval(value, &env)
+        if isError(val) { return val }
+        if val != nil {
+            env.set(name: node.name.value, value: val!)
+        }
+        return val
+
     case is Statement:
         guard let expression = (node as? ExpressionStatement)?.expression else { return nil }
-        return eval(expression)
+        return eval(expression, &env)
 
     case is PrefixExpression:
         guard let node = node as? PrefixExpression, node.right != nil else { return nil }
-        guard let right = eval(node.right!) else { return nil }
+        guard let right = eval(node.right!, &env) else { return nil }
         if isError(right) {
             return right
         }
@@ -43,8 +53,8 @@ public func eval(_ node: Node) -> MonkeyObject? {
 
     case is InfixExpression:
         guard let node = node as? InfixExpression, node.right != nil else { return nil }
-        guard let left = eval(node.left) else { return nil }
-        guard let right = eval(node.right!) else { return nil }
+        guard let left = eval(node.left, &env) else { return nil }
+        guard let right = eval(node.right!, &env) else { return nil }
         if isError(right) {
             return right
         }
@@ -52,7 +62,7 @@ public func eval(_ node: Node) -> MonkeyObject? {
 
     case is IfExpression:
         guard let node = node as? IfExpression else { return nil }
-        return evalIfExpression(node)
+        return evalIfExpression(node, &env)
 
     case is IntegerLiteral:
         let n = node as! IntegerLiteral
@@ -62,16 +72,20 @@ public func eval(_ node: Node) -> MonkeyObject? {
         let n = node as! BooleanLiteral
         return nativeBoolToBooleanObject(n.value)
 
+    case is Identifier:
+        let n = node as! Identifier
+        return evalIdentifier(n, &env)
+
     default:
         return nil
     }
 }
 
-private func evalProgram(_ program: Program) -> MonkeyObject? {
+private func evalProgram(_ program: Program, _ env: inout Environment) -> MonkeyObject? {
     var result: MonkeyObject?
 
     for statement in program.statements {
-        result = eval(statement)
+        result = eval(statement, &env)
 
         switch result {
         case is ReturnValue:
@@ -87,11 +101,11 @@ private func evalProgram(_ program: Program) -> MonkeyObject? {
     return result
 }
 
-private func evalBlockStatement(_ block: BlockStatement) -> MonkeyObject? {
+private func evalBlockStatement(_ block: BlockStatement, _ env: inout Environment) -> MonkeyObject? {
     var result: MonkeyObject?
 
     for statement in block.statements {
-        result = eval(statement)
+        result = eval(statement, &env)
 
         if let result = result, result.type() == .returnValueObj  || result.type() == .errorObj {
             return result
@@ -139,6 +153,13 @@ private func nativeBoolToBooleanObject(_ input: Bool) -> MonkeyBoolean {
     return input ? True : False
 }
 
+private func evalIdentifier(_ node: Identifier, _ env: inout Environment) -> MonkeyObject {
+    guard let val = env.get(name: node.value) else {
+        return newError(message: "identifier not found: \(node.value)")
+    }
+    return val
+}
+
 private func evalInfixExpression(_ op: String, _ left: MonkeyObject, _ right: MonkeyObject) -> MonkeyObject {
     if left.type() == .integerObj && right.type() == .integerObj {
         return evalIntegerInfixExpression(op, left, right)
@@ -177,17 +198,17 @@ private func evalIntegerInfixExpression(_ op: String, _ left: MonkeyObject, _ ri
     }
 }
 
-private func evalIfExpression(_ ie: IfExpression) -> MonkeyObject? {
-    guard let condition = eval(ie.condition) else { return nil }
+private func evalIfExpression(_ ie: IfExpression, _ env: inout Environment) -> MonkeyObject? {
+    guard let condition = eval(ie.condition, &env) else { return nil }
     if isError(condition) {
         return condition
     }
 
     if isTruthy(condition) {
-        return eval(ie.consequence)
+        return eval(ie.consequence, &env)
     }
     else if let alt = ie.alternative {
-        return eval(alt)
+        return eval(alt, &env)
     }
     else {
         return Null

@@ -164,6 +164,7 @@ class EvaluatorTests: XCTestCase {
             Test(input: "5; true + false; 5", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
             Test(input: "if (10 > 1) { true + false }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
             Test(input: "if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
+            Test(input: "foobar", expectedMessage: "identifier not found: foobar"),
         ]
 
         for t in tests {
@@ -174,11 +175,31 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testLetStatements() {
+        struct Test {
+            let input: String
+            let expected: Int
+        }
+
+        let tests: [Test] = [
+            Test(input: "let a = 5; a;", expected: 5),
+            Test(input: "let a = 5 * 5; a;", expected: 25),
+            Test(input: "let a = 5; let b = a; b;", expected: 5),
+            Test(input: "let a = 5; let b = a; let c = a + b + 5; c;", expected: 15),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+            XCTAssertIntegerObject(evaluated, t.expected)
+        }
+    }
+
     func testEval(_ input: String) -> MonkeyObject? {
         let lexer = Lexer(input: input)
         let parser = Parser(lexer: lexer)
         guard let program = parser.parseProgram() else { return nil }
-        return eval(program)
+        var env = Environment()
+        return eval(program, &env)
     }
 
     func XCTAssertIntegerObject(_ object: MonkeyObject?, _ expected: Int, file: StaticString = #file, line: UInt = #line) {
