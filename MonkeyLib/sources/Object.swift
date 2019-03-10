@@ -13,6 +13,7 @@ public enum MonkeyObjectType: String {
     case nullObj = "NULL"
     case returnValueObj = "RETURN_VALUE"
     case errorObj = "ERROR"
+    case functionObj = "FUNCTION"
 }
 
 public protocol MonkeyObject {
@@ -96,4 +97,23 @@ extension ErrorValue: MonkeyObject {
         return "ERROR: " + message
     }
 
+}
+
+struct Function: MonkeyObject {
+    let parameters: [Identifier]
+    let body: BlockStatement
+    let env: Environment
+
+    public func type() -> MonkeyObjectType {
+        return .functionObj
+    }
+
+    public func inspect() -> String {
+        let params = parameters.map { $0.description }
+        return """
+            fn(\(params.joined(separator: ", "))) {
+                \(body.description)
+            }
+        """
+    }
 }

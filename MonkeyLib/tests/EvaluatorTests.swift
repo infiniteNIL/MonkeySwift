@@ -194,12 +194,58 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testFunctionObject() {
+        let input = "fn(x) { x + 2; };"
+
+        let evaluated = testEval(input)
+        let fn = evaluated as? Function
+        XCTAssertNotNil(fn, "object is not Function. got=\(String(describing: evaluated))")
+        XCTAssertEqual(fn?.parameters.count, 1, "function has wrong parameters. Parameters=\(String(describing: fn?.parameters))")
+        XCTAssertEqual(fn?.parameters[0].description, "x", "parameters is not 'x'. got=\(String(describing: fn?.parameters[0]))")
+
+        let expectedBody = "(x + 2)"
+        XCTAssertEqual(fn?.body.description, expectedBody, "body is not \(expectedBody). got \(String(describing: fn?.body.description))")
+    }
+
+    func testFunctionApplication() {
+        struct Test {
+            let input: String
+            let expected: Int
+        }
+
+        let tests: [Test] = [
+            Test(input: "let identity = fn(x) { x; }; identity(5);", expected: 5),
+            Test(input: "let identity = fn(x) { return x; }; identity(5);", expected: 5),
+            Test(input: "let double = fn(x) { x * 2; }; double(5);", expected: 10),
+            Test(input: "let add = fn(x, y) { x + y; }; add(5, 5);", expected: 10),
+            Test(input: "let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", expected: 20),
+            Test(input: "fn(x) { x; }(5)", expected: 5),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+            XCTAssertIntegerObject(evaluated, t.expected)
+        }
+    }
+
+    func testClosures() {
+        let input = """
+            let newAdder = fn(x) {
+                fn(y) { x + y };
+            };
+            let addTwo = newAdder(2);
+            addTwo(2);
+        """
+
+        XCTAssertIntegerObject(testEval(input), 4)
+    }
+
     func testEval(_ input: String) -> MonkeyObject? {
         let lexer = Lexer(input: input)
         let parser = Parser(lexer: lexer)
         guard let program = parser.parseProgram() else { return nil }
-        var env = Environment()
-        return eval(program, &env)
+        let env = Environment()
+        return eval(program, env)
     }
 
     func XCTAssertIntegerObject(_ object: MonkeyObject?, _ expected: Int, file: StaticString = #file, line: UInt = #line) {

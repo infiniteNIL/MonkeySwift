@@ -8,14 +8,31 @@
 
 import Foundation
 
-public struct Environment {
+public class Environment {
     private var store: [String: MonkeyObject] = [:]
+    private let outer: Environment?
 
-    func get(name: String) -> MonkeyObject? {
-        return store[name]
+    init() {
+        outer = nil
     }
 
-    mutating func set(name: String, value: MonkeyObject) {
+    init(outer: Environment) {
+        self.outer = outer
+    }
+
+    func get(name: String) -> MonkeyObject? {
+        if let value = store[name] {
+            return value
+        }
+        else if let outer = outer {
+            return outer.get(name: name)
+        }
+        else {
+            return nil
+        }
+    }
+
+    func set(name: String, value: MonkeyObject) {
         store[name] = value
     }
 }

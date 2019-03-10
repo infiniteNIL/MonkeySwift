@@ -10,7 +10,7 @@ import Foundation
 let prompt = ">> "
 
 func startREPL() {
-    var env = Environment()
+    let env = Environment()
 
     while true {
         print(prompt, terminator: "")
@@ -24,7 +24,7 @@ func startREPL() {
             printParserErrors(parser.errors)
         }
         else if let program = program {
-            if let evaluated = eval(program, &env) {
+            if let evaluated = eval(program, env) {
                 print(evaluated.inspect())
             }
         }
