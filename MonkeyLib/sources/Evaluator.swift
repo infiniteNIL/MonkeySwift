@@ -195,6 +195,9 @@ private func evalInfixExpression(_ op: String, _ left: MonkeyObject, _ right: Mo
         default:    return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
         }
     }
+    else if left.type() == .stringObj && right.type() == .stringObj {
+        return evalStringInfixExpression(op, left, right)
+    }
     else if left.type() != right.type() {
         return newError(message: "type mismatch: \(left.type().rawValue) \(op) \(right.type().rawValue)")
     }
@@ -218,6 +221,16 @@ private func evalIntegerInfixExpression(_ op: String, _ left: MonkeyObject, _ ri
     case "!=":  return nativeBoolToBooleanObject(leftVal != rightVal)
     default:    return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
     }
+}
+
+private func evalStringInfixExpression(_ op: String, _ left: MonkeyObject, _ right: MonkeyObject) -> MonkeyObject {
+    guard op == "+" else {
+        return newError(message: "unknown operator: \(left.type().rawValue) \(op) \(right.type().rawValue)")
+    }
+    guard let leftVal = (left as? MonkeyString)?.value else { return Null }
+    guard let rightVal = (right as? MonkeyString)?.value else { return Null }
+
+    return MonkeyString(value: leftVal + rightVal)
 }
 
 private func evalIfExpression(_ ie: IfExpression, _ env: Environment) -> MonkeyObject? {

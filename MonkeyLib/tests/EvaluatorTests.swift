@@ -171,6 +171,7 @@ class EvaluatorTests: XCTestCase {
             Test(input: "if (10 > 1) { true + false }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
             Test(input: "if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
             Test(input: "foobar", expectedMessage: "identifier not found: foobar"),
+            Test(input: "\"Hello\" - \"World\"", expectedMessage: "unknown operator: STRING - STRING"),
         ]
 
         for t in tests {
@@ -244,6 +245,12 @@ class EvaluatorTests: XCTestCase {
         """
 
         XCTAssertIntegerObject(testEval(input), 4)
+    }
+
+    func testStringConcatentation() {
+        let input = "\"Hello\" + \" \" + \"World!\""
+        let evaluated = testEval(input)
+        XCTAssertStringObject(evaluated, "Hello World!")
     }
 
     func testEval(_ input: String) -> MonkeyObject? {
