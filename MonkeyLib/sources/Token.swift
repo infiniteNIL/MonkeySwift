@@ -20,6 +20,7 @@ public enum TokenType: String {
     // Identifiers + literals
     case ident = "IDENT"    // add, foobar, x, y, ...
     case int = "INT"        // 123456
+    case string = "STRING"
 
     // Operators
     case assign = "="

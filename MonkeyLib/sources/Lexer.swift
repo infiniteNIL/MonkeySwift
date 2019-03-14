@@ -59,6 +59,8 @@ public class Lexer {
         case "{": token = Token(type: .lbrace, literal: String(ch!))
         case "}": token = Token(type: .rbrace, literal: String(ch!))
 
+        case "\"": token = Token(type: .string, literal: readString())
+
         case nil: token = Token(type: .eof, literal: "")
 
         default:
@@ -132,6 +134,17 @@ public class Lexer {
     private func isDigit(_ ch: Character?) -> Bool {
         guard let ch = ch else { return false }
         return "0" <= ch && ch <= "9"
+    }
+
+    private func readString() -> String {
+        let position = input.index(after: self.position)
+        while true {
+            readChar()
+            if ch == "\"" || ch == nil {
+                break
+            }
+        }
+        return String(input[position..<self.position])
     }
 
 }
