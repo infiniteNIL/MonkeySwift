@@ -121,6 +121,21 @@ struct IntegerLiteral: Expression {
     }
 }
 
+struct StringLiteral: Expression {
+    let token: Token
+    let value: String
+
+    func expressionNode() {}
+
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+
+    var description: String {
+        return token.literal
+    }
+}
+
 struct BooleanLiteral: Expression {
     let token: Token
     let value: Bool

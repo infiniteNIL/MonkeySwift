@@ -117,6 +117,22 @@ class ParserTests: XCTestCase {
         XCTAssertIntegerLiteral(literal, 5)
     }
 
+    func testStringLiteralExpression() {
+        let input = "\"hello world\";"
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program!.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let literal = stmt!.expression as? StringLiteral
+        XCTAssertStringLiteral(literal, "hello world")
+    }
+
     func testBooleanLiteral() {
         let input = "true;"
         let lexer = Lexer(input: input)
@@ -399,6 +415,13 @@ class ParserTests: XCTestCase {
         let integer = expr as! IntegerLiteral
         XCTAssertEqual(integer.value, value, "integer literal is not \(integer.value), got \(value)", file: file, line: line)
         XCTAssertEqual(integer.tokenLiteral(), String(value), "integer token literal is not \(value), got \(integer.tokenLiteral())", file: file, line: line)
+    }
+
+    func XCTAssertStringLiteral(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {
+        XCTAssertNotNil(expr as? StringLiteral, "expression is not a string, got \(String(describing: expr))", file: file, line: line)
+        let string = expr as! StringLiteral
+        XCTAssertEqual(string.value, value, "string literal is not \(string.value), got \(value)", file: file, line: line)
+        XCTAssertEqual(string.tokenLiteral(), String(value), "string token literal is not \(value), got \(string.tokenLiteral())", file: file, line: line)
     }
 
     func XCTAssertBooleanLiteral(_ expr: Expression?, _ value: Bool, file: StaticString = #file, line: UInt = #line) {
