@@ -14,6 +14,7 @@ public enum MonkeyObjectType: String {
     case returnValueObj = "RETURN_VALUE"
     case errorObj = "ERROR"
     case functionObj = "FUNCTION"
+    case stringObj = "STRING"
 }
 
 public protocol MonkeyObject {
@@ -33,6 +34,22 @@ extension MonkeyInteger: MonkeyObject {
 
     func inspect() -> String {
         return "\(value)"
+    }
+
+}
+
+struct MonkeyString: Equatable {
+    let value: String
+}
+
+extension MonkeyString: MonkeyObject {
+
+    func type() -> MonkeyObjectType {
+        return .stringObj
+    }
+
+    func inspect() -> String {
+        return value
     }
 
 }

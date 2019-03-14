@@ -68,6 +68,10 @@ public func eval(_ node: Node, _ env: Environment) -> MonkeyObject? {
         let n = node as! IntegerLiteral
         return MonkeyInteger(value: n.value)
 
+    case is StringLiteral:
+        let n = node as! StringLiteral
+        return MonkeyString(value: n.value)
+
     case is BooleanLiteral:
         let n = node as! BooleanLiteral
         return nativeBoolToBooleanObject(n.value)

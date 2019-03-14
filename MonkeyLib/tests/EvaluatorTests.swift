@@ -48,6 +48,12 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testStringLiteral() {
+        let input = "\"Hello World!\""
+        let evaluated = testEval(input)
+        XCTAssertStringObject(evaluated, "Hello World!")
+    }
+
     func testEvalBooleanExpression() {
         struct Test {
             let input: String
@@ -253,6 +259,15 @@ class EvaluatorTests: XCTestCase {
         guard object != nil else { return }
         let result = object as? MonkeyInteger
         XCTAssertNotNil(result, "object is not an Integer. got \(object!) (\(object!))", file: file, line: line)
+        guard result != nil else { return }
+        XCTAssertEqual(result!.value, expected, "object has wrong value. got \(result!.value), want \(expected)", file: file, line: line)
+    }
+
+    func XCTAssertStringObject(_ object: MonkeyObject?, _ expected: String, file: StaticString = #file, line: UInt = #line) {
+        XCTAssertNotNil(object, "object is nil", file: file, line: line)
+        guard object != nil else { return }
+        let result = object as? MonkeyString
+        XCTAssertNotNil(result, "object is not a String. got \(object!) (\(object!))", file: file, line: line)
         guard result != nil else { return }
         XCTAssertEqual(result!.value, expected, "object has wrong value. got \(result!.value), want \(expected)", file: file, line: line)
     }
