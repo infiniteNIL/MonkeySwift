@@ -263,3 +263,37 @@ struct CallExpression: Expression {
         return "\(function)(\(args))"
     }
 }
+
+struct ArrayLiteral: Expression {
+    let token: Token
+    let elements: [Expression]
+
+    func expressionNode() {}
+
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+
+    var description: String {
+        let elementsString = elements
+            .map { String(describing: $0) }
+            .joined(separator: ", ")
+        return "[" + elementsString + "]"
+    }
+}
+
+struct IndexExpression: Expression {
+    let token: Token    // The [
+    let left: Expression
+    let index: Expression
+
+    func expressionNode() {}
+
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+
+    var description: String {
+        return "(" + left.description + "[" + index.description + "])"
+    }
+}

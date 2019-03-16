@@ -252,6 +252,9 @@ class ParserTests: XCTestCase {
             PrecedenceTest(input: "a + add(b * c) + d", expected: "((a + add((b * c))) + d)"),
             PrecedenceTest(input: "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", expected: "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"),
             PrecedenceTest(input: "add(a + b + c * d / f + g)", expected: "add((((a + b) + ((c * d) / f)) + g))"),
+
+            PrecedenceTest(input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)"),
+            PrecedenceTest(input: "add(a * b[2], b[1], 2 * [1, 2][1])", expected: "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"),
         ]
 
         tests.forEach { t in
@@ -401,6 +404,51 @@ class ParserTests: XCTestCase {
         XCTAssertLiteralExpression(exp!.arguments[0], 1)
         XCTAssertInfixExpression(exp!.arguments[1], 2, operator: "*", 3)
         XCTAssertInfixExpression(exp!.arguments[2], 4, operator: "+", 5)
+    }
+
+    func testParsingArrayLiterals() {
+        let input = "[1, 2 * 2, 3 + 3]"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let array = stmt?.expression as? ArrayLiteral
+        XCTAssertNotNil(array)
+
+        XCTAssertEqual(array?.elements.count, 3)
+
+        XCTAssertIntegerLiteral(array?.elements[0], 1)
+        XCTAssertInfixExpression(array?.elements[1], 2, operator: "*", 2)
+        XCTAssertInfixExpression(array?.elements[2], 3, operator: "+", 3)
+    }
+
+    func testParsingIndexExpressions() {
+        let input = "myArray[1 + 1]"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let indexExp = stmt?.expression as? IndexExpression
+        XCTAssertNotNil(indexExp)
+
+        XCTAssertIdentifier(indexExp?.left, "myArray")
+        XCTAssertInfixExpression(indexExp?.index, 1, operator: "+", 1)
     }
 
     func XCTAssertIdentifier(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {

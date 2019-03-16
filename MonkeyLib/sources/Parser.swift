@@ -18,6 +18,7 @@ enum Precedence: Int, Comparable {
     case product        // *
     case prefix         // -x or !x
     case call           // myFunction(x)
+    case index          // array[index]
 
     static func < (lhs: Precedence, rhs: Precedence) -> Bool {
         return lhs.rawValue < rhs.rawValue
@@ -34,6 +35,7 @@ private let precedences: [TokenType: Precedence] = [
     .slash:     .product,
     .asterisk:  .product,
     .lparen:    .call,
+    .lbracket:  .index,
 ]
 
 public class Parser {
@@ -57,6 +59,7 @@ public class Parser {
         registerPrefix(tokenType: .lparen, fn: parseGroupedExpression)
         registerPrefix(tokenType: .if, fn: parseIfExpression)
         registerPrefix(tokenType: .function, fn: parseFunctionLiteral)
+        registerPrefix(tokenType: .lbracket, fn: parseArrayLiteral)
 
         registerInfix(tokenType: .plus, fn: parseInfixExpression)
         registerInfix(tokenType: .minus, fn: parseInfixExpression)
@@ -67,6 +70,7 @@ public class Parser {
         registerInfix(tokenType: .lt, fn: parseInfixExpression)
         registerInfix(tokenType: .gt, fn: parseInfixExpression)
         registerInfix(tokenType: .lparen, fn: parseCallExpression)
+        registerInfix(tokenType: .lbracket, fn: parseIndexExpression)
 
         // Read 2 tokens, so currentToken and peekToken are both set
         nextToken()
@@ -302,31 +306,46 @@ public class Parser {
 
     private func parseCallExpression(_ function: Expression) -> Expression? {
         let token = currentToken
-        guard let arguments = parseCallArguments() else { return nil }
+        guard let arguments = parseExpressionList(end: .rparen) else { return nil }
         return CallExpression(token: token, function: function, arguments: arguments)
     }
 
-    private func parseCallArguments() -> [Expression]? {
-        var args: [Expression] = []
+    private func parseArrayLiteral() -> Expression? {
+        let token = currentToken
+        guard let elements = parseExpressionList(end: .rbracket) else { return nil }
+        return ArrayLiteral(token: token, elements: elements)
+    }
 
-        if peekToken.type == .rparen {
+    private func parseExpressionList(end: TokenType) -> [Expression]? {
+        var list: [Expression] = []
+
+        if peekToken.type == end {
             nextToken()
-            return args
+            return list
         }
 
         nextToken()
-        guard let arg = parseExpression(precedence: .lowest) else { return nil }
-        args.append(arg)
+        guard let element = parseExpression(precedence: .lowest) else { return nil }
+        list.append(element)
 
         while peekToken.type == .comma {
             nextToken()
             nextToken()
-            guard let arg = parseExpression(precedence: .lowest) else { return nil }
-            args.append(arg)
+            guard let element = parseExpression(precedence: .lowest) else { return nil }
+            list.append(element)
         }
 
-        guard expectPeek(.rparen) else { return nil }
-        return args
+        guard expectPeek(end) else { return nil }
+        return list
+    }
+
+    private func parseIndexExpression(left: Expression) -> Expression? {
+        nextToken()
+        guard let index = parseExpression(precedence: .lowest) else { return nil }
+        guard peekToken.type == .rbracket else { return nil }
+
+        nextToken()
+        return IndexExpression(token: currentToken, left: left, index: index)
     }
 
     private func expectPeek(_ type: TokenType) -> Bool {
