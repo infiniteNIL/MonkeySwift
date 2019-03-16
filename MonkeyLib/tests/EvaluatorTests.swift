@@ -285,6 +285,50 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testArrayLiterals() {
+        let input = "[1, 2 * 2, 3 + 3]"
+        let evaluated = testEval(input)
+
+        let result = evaluated as? MonkeyArray
+        XCTAssertNotNil(result, "object is not an Array. got=\(String(describing: evaluated))")
+        XCTAssertEqual(result?.elements.count, 3, "array has wrong num of elements. got=\(String(describing: result?.elements.count))")
+
+        XCTAssertIntegerObject(result?.elements[0], 1)
+        XCTAssertIntegerObject(result?.elements[1], 4)
+        XCTAssertIntegerObject(result?.elements[2], 6)
+    }
+
+    func testArrayIndexExpressions() {
+        struct Test {
+            let input: String
+            let expected: Int?
+        }
+
+        let tests: [Test] = [
+            Test(input: "[1, 2, 3][0]", expected: 1),
+            Test(input: "[1, 2, 3][1]", expected: 2),
+            Test(input: "[1, 2, 3][2]", expected: 3),
+            Test(input: "let i = 0; [1][i];", expected: 1),
+            Test(input: "[1, 2, 3][1 + 1];", expected: 3),
+            Test(input: "let myArray = [1, 2, 3]; myArray[2];", expected: 3),
+            Test(input: "let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expected: 6),
+            Test(input: "let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]", expected: 2),
+            Test(input: "[1, 2, 3][3]", expected: nil),
+            Test(input: "[1, 2, 3][-1]", expected: nil),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+
+            if let integer = t.expected {
+                XCTAssertIntegerObject(evaluated, integer)
+            }
+            else {
+                XCTAssertNullObject(evaluated)
+            }
+        }
+    }
+
     func testEval(_ input: String) -> MonkeyObject? {
         let lexer = Lexer(input: input)
         let parser = Parser(lexer: lexer)
@@ -320,9 +364,14 @@ class EvaluatorTests: XCTestCase {
         XCTAssertEqual(result!.value, expected, "object has wrong value. got \(result!.value), want \(expected)", file: file, line: line)
     }
 
-    func XCTAssertNullObject(_ object: MonkeyObject, file: StaticString = #file, line: UInt = #line) {
+    func XCTAssertNullObject(_ object: MonkeyObject?, file: StaticString = #file, line: UInt = #line) {
         let obj = object as? MonkeyNull
-        XCTAssertNotNil(obj, "object is not NULL. got \(object) \(object)", file: file, line: line)
+        XCTAssertNotNil(
+            obj,
+            "object is not NULL. got \(String(describing: object)) \(String(describing: object))",
+            file: file,
+            line: line
+        )
     }
 
 }

@@ -16,6 +16,7 @@ public enum MonkeyObjectType: String {
     case functionObj = "FUNCTION"
     case stringObj = "STRING"
     case builtinObj = "BUILTIN"
+    case arrayObj = "ARRAY"
 }
 
 public protocol MonkeyObject {
@@ -149,4 +150,16 @@ struct Builtin: MonkeyObject {
         return "builtin function"
     }
 
+}
+
+struct MonkeyArray: MonkeyObject {
+    let elements: [MonkeyObject]
+
+    func type() -> MonkeyObjectType {
+        return .arrayObj
+    }
+
+    func inspect() -> String {
+        return "[" + elements.map({ $0.inspect() }).joined(separator: ", ") + "]"
+    }
 }

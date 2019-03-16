@@ -98,6 +98,26 @@ public func eval(_ node: Node, _ env: Environment) -> MonkeyObject? {
         }
         return applyFunction(function, args)
 
+    case is ArrayLiteral:
+        let node = node as! ArrayLiteral
+        let elements = evalExpressions(node.elements, env)
+        if elements.count == 1 && isError(elements[0]) {
+            return elements[0]
+        }
+        return MonkeyArray(elements: elements)
+
+    case is IndexExpression:
+        let node = node as! IndexExpression
+        let left = eval(node.left, env)
+        if isError(left) {
+            return left
+        }
+        let index = eval(node.index, env)
+        if isError(index) {
+            return index
+        }
+        return evalIndexExpression(left, index)
+
     default:
         return nil
     }
@@ -320,4 +340,23 @@ private func unwrapReturnValue(_ obj: MonkeyObject?) -> MonkeyObject? {
         return returnValue.value
     }
     return obj
+}
+
+private func evalIndexExpression(_ left: MonkeyObject?, _ index: MonkeyObject?) -> MonkeyObject? {
+    guard let left = left, let index = index else { return nil }
+    guard left.type() == .arrayObj && index.type() == .integerObj else {
+        return newError(message: "index operator not supported: \(left.type())")
+    }
+
+    return evalArrayIndexExpression(left, index)
+}
+
+private func evalArrayIndexExpression(_ array: MonkeyObject, _ index: MonkeyObject) -> MonkeyObject? {
+    guard let arrayObject = array as? MonkeyArray else { return nil }
+    guard let idx = (index as? MonkeyInteger)?.value else { return nil }
+
+    let max = arrayObject.elements.count - 1
+    guard idx >= 0 && idx <= max else { return MonkeyNull() }
+
+    return arrayObject.elements[idx]
 }
