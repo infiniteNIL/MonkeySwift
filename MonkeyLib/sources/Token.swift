@@ -43,6 +43,8 @@ public enum TokenType: String {
     case rparen = ")"
     case lbrace = "{"
     case rbrace = "}"
+    case lbracket = "["
+    case rbracket = "]"
 
     // Keywords
     case function = "FUNCTION"

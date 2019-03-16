@@ -61,6 +61,9 @@ public class Lexer {
 
         case "\"": token = Token(type: .string, literal: readString())
 
+        case "[": token = Token(type: .lbracket, literal: String(ch!))
+        case "]": token = Token(type: .rbracket, literal: String(ch!))
+
         case nil: token = Token(type: .eof, literal: "")
 
         default:

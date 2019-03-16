@@ -47,6 +47,7 @@ class LexerTests: XCTestCase {
             10 != 9;
             "foobar"
             "foo bar"
+            [1, 2];
         """
 
         let tests: [LexerTest] = [
@@ -131,6 +132,13 @@ class LexerTests: XCTestCase {
 
             LexerTest(expectedType: .string, expectedLiteral: "foobar"),
             LexerTest(expectedType: .string, expectedLiteral: "foo bar"),
+
+            LexerTest(expectedType: .lbracket, expectedLiteral: "["),
+            LexerTest(expectedType: .int, expectedLiteral: "1"),
+            LexerTest(expectedType: .comma, expectedLiteral: ","),
+            LexerTest(expectedType: .int, expectedLiteral: "2"),
+            LexerTest(expectedType: .rbracket, expectedLiteral: "]"),
+            LexerTest(expectedType: .semicolon, expectedLiteral: ";"),
 
             LexerTest(expectedType: .eof, expectedLiteral: ""),
         ]
