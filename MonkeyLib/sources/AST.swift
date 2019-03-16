@@ -11,13 +11,9 @@ public protocol Node: CustomStringConvertible {
     func tokenLiteral() -> String
 }
 
-protocol Statement: Node {
-    func statementNode()
-}
+protocol Statement: Node {}
 
-protocol Expression: Node {
-    func expressionNode()
-}
+protocol Expression: Node {}
 
 public struct Program: Node {
     var statements: [Statement] = []
@@ -43,9 +39,6 @@ struct LetStatement: Statement {
     var name: Identifier
     var value: Expression?
 
-    func statementNode() {
-    }
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -60,9 +53,6 @@ struct Identifier: Expression {
     let token: Token
     let value: String
 
-    func expressionNode() {
-    }
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -75,8 +65,6 @@ struct Identifier: Expression {
 struct ReturnStatement: Statement {
     let token: Token
     let returnValue: Expression?
-
-    func statementNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -92,13 +80,8 @@ struct ExpressionStatement: Statement, Expression {
     let token: Token
     let expression: Expression?
 
-    func statementNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
-    }
-
-    func expressionNode() {
     }
 
     var description: String {
@@ -109,8 +92,6 @@ struct ExpressionStatement: Statement, Expression {
 struct IntegerLiteral: Expression {
     let token: Token
     let value: Int
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -125,8 +106,6 @@ struct StringLiteral: Expression {
     let token: Token
     let value: String
 
-    func expressionNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -139,8 +118,6 @@ struct StringLiteral: Expression {
 struct BooleanLiteral: Expression {
     let token: Token
     let value: Bool
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -155,8 +132,6 @@ struct PrefixExpression: Expression {
     let token: Token
     let `operator`: String
     let right: Expression?
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -174,8 +149,6 @@ struct InfixExpression: Expression {
     let `operator`: String
     let right: Expression?
 
-    func expressionNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -191,8 +164,6 @@ struct IfExpression: Expression {
     let condition: Expression
     let consequence: BlockStatement
     let alternative: BlockStatement?
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -211,8 +182,6 @@ struct BlockStatement: Statement {
     let token: Token
     let statements: [Statement]
 
-    func statementNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -228,8 +197,6 @@ struct FunctionLiteral: Expression {
     let token: Token
     let parameters: [Identifier]
     let body: BlockStatement
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
@@ -249,8 +216,6 @@ struct CallExpression: Expression {
     let function: Expression
     let arguments: [Expression]
 
-    func expressionNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -268,8 +233,6 @@ struct ArrayLiteral: Expression {
     let token: Token
     let elements: [Expression]
 
-    func expressionNode() {}
-
     func tokenLiteral() -> String {
         return token.literal
     }
@@ -286,8 +249,6 @@ struct IndexExpression: Expression {
     let token: Token    // The [
     let left: Expression
     let index: Expression
-
-    func expressionNode() {}
 
     func tokenLiteral() -> String {
         return token.literal
