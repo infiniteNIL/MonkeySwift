@@ -176,10 +176,15 @@ private func nativeBoolToBooleanObject(_ input: Bool) -> MonkeyBoolean {
 }
 
 private func evalIdentifier(_ node: Identifier, _ env: Environment) -> MonkeyObject {
-    guard let val = env.get(name: node.value) else {
-        return newError(message: "identifier not found: \(node.value)")
+    if let val = env.get(name: node.value) {
+        return val
     }
-    return val
+
+    if let builtin = builtins[node.value] {
+        return builtin
+    }
+
+    return newError(message: "identifier not found: \(node.value)")
 }
 
 private func evalInfixExpression(_ op: String, _ left: MonkeyObject, _ right: MonkeyObject) -> MonkeyObject {
@@ -276,7 +281,7 @@ private func isTruthy(_ object: MonkeyObject) -> Bool {
     }
 }
 
-private func newError(message: String) -> ErrorValue {
+func newError(message: String) -> ErrorValue {
     return ErrorValue(message: message)
 }
 
@@ -285,13 +290,19 @@ private func isError(_ obj: MonkeyObject?) -> Bool {
 }
 
 private func applyFunction(_ fn: MonkeyObject?, _ args: [MonkeyObject]) -> MonkeyObject? {
-    guard let function = fn as? Function else {
+    switch fn {
+    case is Function:
+        let fn = fn as! Function
+        let extendedEnv = extendFunctionEnv(fn, args)
+        let evaluated = eval(fn.body, extendedEnv)
+        return unwrapReturnValue(evaluated)
+
+    case is Builtin:
+        return (fn as! Builtin).fn(args)
+
+    default:
         return newError(message: "not a function: \(String(describing: fn?.type()))")
     }
-
-    let extendedEnv = extendFunctionEnv(function, args)
-    let evaluated = eval(function.body, extendedEnv)
-    return unwrapReturnValue(evaluated)
 }
 
 private func extendFunctionEnv(_ fn: Function, _ args: [MonkeyObject]) -> Environment {

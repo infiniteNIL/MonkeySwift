@@ -30,6 +30,8 @@
 		DC5DFBB3222B98670065253A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB1D222B62260065253A /* Token.swift */; };
 		DC5DFBB522348B240065253A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFBB422348B240065253A /* Environment.swift */; };
 		DC5DFBB622348B2C0065253A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFBB422348B240065253A /* Environment.swift */; };
+		DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3C7223C9D8300783E0C /* Builtins.swift */; };
+		DC99E3C9223C9D8300783E0C /* Builtins.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3C7223C9D8300783E0C /* Builtins.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,7 @@
 		DC5DFBA0222B98430065253A /* MonkeyLibTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonkeyLibTests.swift; sourceTree = "<group>"; };
 		DC5DFBA2222B98430065253A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC5DFBB422348B240065253A /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		DC99E3C7223C9D8300783E0C /* Builtins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builtins.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +157,7 @@
 				DC5DFB1C222B62260065253A /* Object.swift */,
 				DC5DFB1D222B62260065253A /* Token.swift */,
 				DC5DFBB422348B240065253A /* Environment.swift */,
+				DC99E3C7223C9D8300783E0C /* Builtins.swift */,
 			);
 			path = sources;
 			sourceTree = "<group>";
@@ -327,6 +331,7 @@
 				DC5DFB14222B61980065253A /* Repl.swift in Sources */,
 				DC5DFB1F222B62260065253A /* Evaluator.swift in Sources */,
 				DC5DFB21222B62260065253A /* Parser.swift in Sources */,
+				DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */,
 				DC5DFB22222B62260065253A /* Object.swift in Sources */,
 				DC5DFBB622348B2C0065253A /* Environment.swift in Sources */,
 				DC5DFB1E222B62260065253A /* Lexer.swift in Sources */,
@@ -343,6 +348,7 @@
 				DC5DFBB2222B98670065253A /* Object.swift in Sources */,
 				DC5DFBB1222B98670065253A /* Parser.swift in Sources */,
 				DC5DFBB0222B98670065253A /* AST.swift in Sources */,
+				DC99E3C9223C9D8300783E0C /* Builtins.swift in Sources */,
 				DC5DFBB522348B240065253A /* Environment.swift in Sources */,
 				DC5DFBB3222B98670065253A /* Token.swift in Sources */,
 				DC5DFBAE222B98670065253A /* Lexer.swift in Sources */,

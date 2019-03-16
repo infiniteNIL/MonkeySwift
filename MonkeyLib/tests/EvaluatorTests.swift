@@ -253,6 +253,38 @@ class EvaluatorTests: XCTestCase {
         XCTAssertStringObject(evaluated, "Hello World!")
     }
 
+    func testBuiltinFunctions() {
+        struct Test {
+            let input: String
+            let expected: Any
+        }
+
+        let tests: [Test] = [
+            Test(input: "len(\"\")", expected: 0),
+            Test(input: "len(\"four\")", expected: 4),
+            Test(input: "len(\"hello world\")", expected: 11),
+            Test(input: "len(1)", expected: "argument to 'len' not supported. got INTEGER"),
+            Test(input: "len(\"one\", \"two\")", expected: "wrong number of arguments. got=2, want=1"),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+
+            switch t.expected {
+            case is Int:
+                XCTAssertIntegerObject(evaluated, t.expected as! Int)
+
+            case is String:
+                let errObj = evaluated as? ErrorValue
+                XCTAssertNotNil(errObj, "object is not Error. got=\(String(describing: evaluated))")
+                XCTAssertEqual(errObj?.message, t.expected as? String, "wrong error message. expected=\(t.expected), got=\(String(describing: errObj?.message))")
+
+            default:
+                XCTFail("Unexpected type")
+            }
+        }
+    }
+
     func testEval(_ input: String) -> MonkeyObject? {
         let lexer = Lexer(input: input)
         let parser = Parser(lexer: lexer)

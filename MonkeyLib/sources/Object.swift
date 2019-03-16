@@ -15,6 +15,7 @@ public enum MonkeyObjectType: String {
     case errorObj = "ERROR"
     case functionObj = "FUNCTION"
     case stringObj = "STRING"
+    case builtinObj = "BUILTIN"
 }
 
 public protocol MonkeyObject {
@@ -133,4 +134,19 @@ struct Function: MonkeyObject {
             }
         """
     }
+}
+
+typealias BuiltinFunction = ([MonkeyObject]) -> MonkeyObject?
+
+struct Builtin: MonkeyObject {
+    let fn: BuiltinFunction
+
+    func type() -> MonkeyObjectType {
+        return .builtinObj
+    }
+
+    func inspect() -> String {
+        return "builtin function"
+    }
+
 }
