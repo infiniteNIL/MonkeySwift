@@ -451,6 +451,148 @@ class ParserTests: XCTestCase {
         XCTAssertInfixExpression(indexExp?.index, 1, operator: "+", 1)
     }
 
+    func testParsingHashLiterals() {
+        let input = "{\"one\": 1, \"two\": 2, \"three\": 3}"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let hash = stmt?.expression as? HashLiteral
+        XCTAssertNotNil(hash, "exp is not a HashLiteral. got=\(String(describing: stmt?.expression))")
+
+        XCTAssertEqual(hash?.pairs.count, 3, "hash.pairs has wrong length. got=\(String(describing: hash?.pairs.count))")
+
+        let expected = ["one": 1, "two": 2, "three": 3]
+        for (key, value) in hash?.pairs ?? [] {
+            let literal = key as? StringLiteral
+            XCTAssertNotNil(literal, "key is not StringLiteral. got=\(key)")
+            let expectedValue = expected[literal?.description ?? ""] ?? 0
+            XCTAssertIntegerLiteral(value, expectedValue)
+        }
+    }
+
+    func testParsingHashLiteralsWithIntegerKeys() {
+        let input = "{1: 1, 2: 2, 3: 3}"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let hash = stmt?.expression as? HashLiteral
+        XCTAssertNotNil(hash, "exp is not a HashLiteral. got=\(String(describing: stmt?.expression))")
+
+        XCTAssertEqual(hash?.pairs.count, 3, "hash.pairs has wrong length. got=\(String(describing: hash?.pairs.count))")
+
+        let expected = [1: 1, 2: 2, 3: 3]
+        for (key, value) in hash?.pairs ?? [] {
+            let literal = key as? IntegerLiteral
+            XCTAssertNotNil(literal, "key is not IntegerLiteral. got=\(key)")
+            let expectedValue = expected[literal?.value ?? 0] ?? 0
+            XCTAssertIntegerLiteral(value, expectedValue)
+        }
+    }
+
+    func testParsingHashLiteralsWithBooleanKeys() {
+        let input = "{true: 1, false: 0}"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let hash = stmt?.expression as? HashLiteral
+        XCTAssertNotNil(hash, "exp is not a HashLiteral. got=\(String(describing: stmt?.expression))")
+
+        XCTAssertEqual(hash?.pairs.count, 2, "hash.pairs has wrong length. got=\(String(describing: hash?.pairs.count))")
+
+        let expected = [true: 1, false: 0]
+        for (key, value) in hash?.pairs ?? [] {
+            let literal = key as? BooleanLiteral
+            XCTAssertNotNil(literal, "key is not BooleanLiteral. got=\(key)")
+            let expectedValue = expected[literal!.value]!
+            XCTAssertIntegerLiteral(value, expectedValue)
+        }
+    }
+
+    func testParsingEmptyHashLiterals() {
+        let input = "{}"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let hash = stmt?.expression as? HashLiteral
+        XCTAssertNotNil(hash, "exp is not a HashLiteral. got=\(String(describing: stmt?.expression))")
+
+        XCTAssertEqual(hash?.pairs.count, 0, "hash.pairs has wrong length. got=\(String(describing: hash?.pairs.count))")
+    }
+
+    func testParsingHashLiteralsWithExpressions() {
+        let input = "{\"one\": 0 + 1, \"two\": 10 - 8, \"three\": 15 / 5}"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let hash = stmt?.expression as? HashLiteral
+        XCTAssertNotNil(hash, "exp is not a HashLiteral. got=\(String(describing: stmt?.expression))")
+
+        XCTAssertEqual(hash?.pairs.count, 3, "hash.pairs has wrong length. got=\(String(describing: hash?.pairs.count))")
+
+        let tests = [
+            "one":      { (e: Expression) in self.XCTAssertInfixExpression(e, 0, operator: "+", 1) },
+            "two":      { (e: Expression) in self.XCTAssertInfixExpression(e, 10, operator: "-", 8) },
+            "three":    { (e: Expression) in self.XCTAssertInfixExpression(e, 15, operator: "/", 5) },
+        ]
+
+        for (key, value) in hash?.pairs ?? [] {
+            let literal = key as? StringLiteral
+            XCTAssertNotNil(literal, "key is not StringLiteral. got=\(key)")
+
+            let testFunc = tests[literal!.description]
+            XCTAssertNotNil(testFunc, "No test funcdtion for key \(literal!.description) found")
+            if testFunc != nil {
+                testFunc!(value)
+            }
+        }
+    }
+
+
     func XCTAssertIdentifier(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(expr as? Identifier, "expression is not an Identifier. Got \(String(describing: expr))", file: file, line: line)
         let ident = expr as! Identifier

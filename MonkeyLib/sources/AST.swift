@@ -258,3 +258,19 @@ struct IndexExpression: Expression {
         return "(" + left.description + "[" + index.description + "])"
     }
 }
+
+struct HashLiteral: Expression {
+    let token: Token
+    let pairs: [(Expression, Expression)]
+
+    var description: String {
+        var pairStrings: [String] = []
+        for (key, value) in pairs {
+            pairStrings.append(key.description + ": " + value.description)
+        }
+
+        return "{" + pairStrings.joined(separator: ", ") + "}"
+    }
+
+    func tokenLiteral() -> String { return token.literal }
+}

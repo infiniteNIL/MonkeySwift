@@ -60,6 +60,7 @@ public class Parser {
         registerPrefix(tokenType: .if, fn: parseIfExpression)
         registerPrefix(tokenType: .function, fn: parseFunctionLiteral)
         registerPrefix(tokenType: .lbracket, fn: parseArrayLiteral)
+        registerPrefix(tokenType: .lbrace, fn: parseHashLiteral)
 
         registerInfix(tokenType: .plus, fn: parseInfixExpression)
         registerInfix(tokenType: .minus, fn: parseInfixExpression)
@@ -346,6 +347,34 @@ public class Parser {
 
         nextToken()
         return IndexExpression(token: currentToken, left: left, index: index)
+    }
+
+    private func parseHashLiteral() -> Expression? {
+        let token = currentToken
+        var pairs: [(Expression, Expression)] = []
+
+        while peekToken.type != .rbrace {
+            nextToken()
+            guard let key = parseExpression(precedence: .lowest) else { return nil }
+            guard expectPeek(.colon) else { return nil }
+
+            nextToken()
+            guard let value = parseExpression(precedence: .lowest) else { return nil }
+            pairs.append((key, value))
+
+            if peekToken.type == .comma {
+                nextToken()
+            }
+            else if peekToken.type == .rbrace {
+                // Nothing to do. Go around again
+            }
+            else {
+                return nil  // Unexpected token
+            }
+        }
+
+        guard expectPeek(.rbrace) else { return nil }
+        return HashLiteral(token: token, pairs: pairs)
     }
 
     private func expectPeek(_ type: TokenType) -> Bool {
