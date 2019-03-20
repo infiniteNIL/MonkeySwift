@@ -17,6 +17,12 @@ public enum MonkeyObjectType: String {
     case stringObj = "STRING"
     case builtinObj = "BUILTIN"
     case arrayObj = "ARRAY"
+    case hashObj = "HASH"
+}
+
+struct HashKey: Hashable {
+    let type: MonkeyObjectType
+    let value: Int
 }
 
 public protocol MonkeyObject {
@@ -38,6 +44,10 @@ extension MonkeyInteger: MonkeyObject {
         return "\(value)"
     }
 
+    func hashKey() -> HashKey {
+        return HashKey(type: .integerObj, value: value)
+    }
+
 }
 
 struct MonkeyString: Equatable {
@@ -54,6 +64,10 @@ extension MonkeyString: MonkeyObject {
         return value
     }
 
+    func hashKey() -> HashKey {
+        return HashKey(type: .stringObj, value: value.hashValue)
+    }
+
 }
 
 public struct MonkeyBoolean: Equatable {
@@ -68,6 +82,11 @@ extension MonkeyBoolean: MonkeyObject {
 
     public func inspect() -> String {
         return "\(value)"
+    }
+
+    func hashKey() -> HashKey {
+        let value = self.value ? 1 : 0
+        return HashKey(type: .booleanObj, value: value)
     }
 
 }
@@ -163,3 +182,29 @@ struct MonkeyArray: MonkeyObject {
         return "[" + elements.map({ $0.inspect() }).joined(separator: ", ") + "]"
     }
 }
+
+struct HashPair {
+    let key: MonkeyObject
+    let value: MonkeyObject
+}
+
+struct MonkeyHash: MonkeyObject {
+    let pairs: [HashKey: HashPair]
+
+    func type() -> MonkeyObjectType {
+        return .hashObj
+    }
+
+    func inspect() -> String {
+        let pairStrings = pairs.map { "\($0.key.hashValue): \($0.value.value.inspect())" }
+        return "{" + pairStrings.joined(separator: ", ") + "}"
+    }
+}
+
+protocol MonkeyHashable {
+    func hashKey() -> HashKey
+}
+
+extension MonkeyString: MonkeyHashable {}
+extension MonkeyInteger: MonkeyHashable {}
+extension MonkeyBoolean: MonkeyHashable {}

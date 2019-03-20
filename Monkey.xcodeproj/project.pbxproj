@@ -32,6 +32,7 @@
 		DC5DFBB622348B2C0065253A /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFBB422348B240065253A /* Environment.swift */; };
 		DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3C7223C9D8300783E0C /* Builtins.swift */; };
 		DC99E3C9223C9D8300783E0C /* Builtins.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3C7223C9D8300783E0C /* Builtins.swift */; };
+		DC99E3CD223EF99B00783E0C /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3CA223EF95800783E0C /* ObjectTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		DC5DFBA2222B98430065253A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC5DFBB422348B240065253A /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		DC99E3C7223C9D8300783E0C /* Builtins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builtins.swift; sourceTree = "<group>"; };
+		DC99E3CA223EF95800783E0C /* ObjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +171,7 @@
 				DC5DFB28222B624C0065253A /* ParserTests.swift */,
 				DC5DFB29222B624C0065253A /* LexerTests.swift */,
 				DC5DFB2A222B624C0065253A /* EvaluatorTests.swift */,
+				DC99E3CA223EF95800783E0C /* ObjectTests.swift */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 			files = (
 				DC5DFBAA222B98600065253A /* ASTTests.swift in Sources */,
 				DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */,
+				DC99E3CD223EF99B00783E0C /* ObjectTests.swift in Sources */,
 				DC5DFBAC222B98600065253A /* LexerTests.swift in Sources */,
 				DC5DFBAB222B98600065253A /* ParserTests.swift in Sources */,
 				DC5DFBAD222B98600065253A /* EvaluatorTests.swift in Sources */,

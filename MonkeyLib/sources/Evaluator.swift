@@ -118,6 +118,10 @@ public func eval(_ node: Node, _ env: Environment) -> MonkeyObject? {
         }
         return evalIndexExpression(left, index)
 
+    case is HashLiteral:
+        let node = node as! HashLiteral
+        return evalHashLiteral(node, env)
+
     default:
         return nil
     }
@@ -344,11 +348,17 @@ private func unwrapReturnValue(_ obj: MonkeyObject?) -> MonkeyObject? {
 
 private func evalIndexExpression(_ left: MonkeyObject?, _ index: MonkeyObject?) -> MonkeyObject? {
     guard let left = left, let index = index else { return nil }
-    guard left.type() == .arrayObj && index.type() == .integerObj else {
+
+    switch (left.type(), index.type()) {
+    case (.arrayObj, .integerObj):
+        return evalArrayIndexExpression(left, index)
+
+    case (.hashObj, _):
+        return evalHashIndexExpression(left, index)
+
+    default:
         return newError(message: "index operator not supported: \(left.type())")
     }
-
-    return evalArrayIndexExpression(left, index)
 }
 
 private func evalArrayIndexExpression(_ array: MonkeyObject, _ index: MonkeyObject) -> MonkeyObject? {
@@ -359,4 +369,42 @@ private func evalArrayIndexExpression(_ array: MonkeyObject, _ index: MonkeyObje
     guard idx >= 0 && idx <= max else { return MonkeyNull() }
 
     return arrayObject.elements[idx]
+}
+
+private func evalHashLiteral(_ node: HashLiteral, _ env: Environment) -> MonkeyObject? {
+    var pairs: [HashKey: HashPair] = [:]
+
+    for (keyNode, valueNode) in node.pairs {
+        guard let key = eval(keyNode, env) else { return nil }
+        if isError(key) {
+            return key
+        }
+
+        guard let hashKey = key as? MonkeyHashable else {
+            return newError(message: "unusable as hash key: \(String(describing: key.type()))")
+        }
+
+        guard let value = eval(valueNode, env) else { return nil }
+        if isError(value) {
+            return value
+        }
+
+        let hashed = hashKey.hashKey()
+        pairs[hashed] = HashPair(key: key, value: value)
+    }
+
+    return MonkeyHash(pairs: pairs)
+}
+
+private func evalHashIndexExpression(_ hash: MonkeyObject, _ index: MonkeyObject) -> MonkeyObject? {
+    guard let hashObject = hash as? MonkeyHash else { return nil }
+    guard let key = index as? MonkeyHashable else {
+        return newError(message: "unusable as hash key: \(index.type().rawValue)")
+    }
+
+    guard let pair = hashObject.pairs[key.hashKey()] else {
+        return MonkeyNull()
+    }
+
+    return pair.value
 }

@@ -172,6 +172,7 @@ class EvaluatorTests: XCTestCase {
             Test(input: "if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", expectedMessage: "unknown operator: BOOLEAN + BOOLEAN"),
             Test(input: "foobar", expectedMessage: "identifier not found: foobar"),
             Test(input: "\"Hello\" - \"World\"", expectedMessage: "unknown operator: STRING - STRING"),
+            Test(input: "{\"name\": \"Monkey\"}[fn(x) { x }];", expectedMessage: "unusable as hash key: FUNCTION"),
         ]
 
         for t in tests {
@@ -320,6 +321,69 @@ class EvaluatorTests: XCTestCase {
         for t in tests {
             let evaluated = testEval(t.input)
 
+            if let integer = t.expected {
+                XCTAssertIntegerObject(evaluated, integer)
+            }
+            else {
+                XCTAssertNullObject(evaluated)
+            }
+        }
+    }
+
+    func testHashLiterals() {
+        let input = """
+            let two = "two";
+            {
+                "one": 10 - 9,
+                two: 1 + 1,
+                "thr" + "ee": 6 / 2,
+                4: 4,
+                true: 5,
+                false: 6
+            }
+        """
+
+        let evaluated = testEval(input)
+        let result = evaluated as? MonkeyHash
+        XCTAssertNotNil(result, "eval didn't return a hash. got=\(String(describing: evaluated))")
+
+        let expected: [HashKey: Int] = [
+            MonkeyString(value: "one").hashKey():   1,
+            MonkeyString(value: "two").hashKey():   2,
+            MonkeyString(value: "three").hashKey(): 3,
+            MonkeyInteger(value: 4).hashKey():      4,
+            MonkeyBoolean(value: true).hashKey():   5,
+            MonkeyBoolean(value: false).hashKey():  6
+        ]
+
+        XCTAssertEqual(result?.pairs.count, expected.count, "Hash has wrong number of pairs. got=\(String(describing: result?.pairs.count))")
+
+        for (expectedKey, expectedValue) in expected {
+            let pair = result?.pairs[expectedKey]
+            XCTAssertNotNil(pair, "no pair for given key in pairs")
+
+            XCTAssertIntegerObject(pair?.value, expectedValue)
+        }
+    }
+
+    func testHashIndexExpression() {
+        struct Test {
+            let input: String
+            let expected: Int?
+        }
+
+        let tests: [Test] = [
+            Test(input: "{\"foo\": 5}[\"foo\"]", expected: 5),
+            Test(input: "{\"foo\": 5}[\"bar\"]", expected: nil),
+            Test(input: "let key = \"foo\"; {\"foo\": 5}[key]", expected: 5),
+            Test(input: "{}[\"foo\"]", expected: nil),
+            Test(input: "{5: 5}[5]", expected: 5),
+            Test(input: "{true: 5}[true]", expected: 5),
+            Test(input: "{false: 5}[false]", expected: 5),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
             if let integer = t.expected {
                 XCTAssertIntegerObject(evaluated, integer)
             }
