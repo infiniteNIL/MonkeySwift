@@ -13,6 +13,7 @@ var builtins: [String: Builtin] = [
     "last":     Builtin(fn: last),
     "len":      Builtin(fn: len),
     "push":     Builtin(fn: push),
+    "puts":     Builtin(fn: puts),
     "rest":     Builtin(fn: rest),
 ]
 
@@ -97,5 +98,12 @@ private func rest(_ args: [MonkeyObject]) -> MonkeyObject? {
         return MonkeyArray(elements: newElements)
     }
 
+    return MonkeyNull()
+}
+
+private func puts(_ args: [MonkeyObject]) -> MonkeyObject? {
+    for arg in args {
+        print(arg.inspect())
+    }
     return MonkeyNull()
 }
