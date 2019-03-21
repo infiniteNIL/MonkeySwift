@@ -393,14 +393,6 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
-    func testEval(_ input: String) -> MonkeyObject? {
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
-        guard let program = parser.parseProgram() else { return nil }
-        let env = Environment()
-        return eval(program, env)
-    }
-
     func XCTAssertIntegerObject(_ object: MonkeyObject?, _ expected: Int, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(object, "object is nil", file: file, line: line)
         guard object != nil else { return }
@@ -438,4 +430,12 @@ class EvaluatorTests: XCTestCase {
         )
     }
 
+}
+
+func testEval(_ input: String) -> MonkeyObject? {
+    let lexer = Lexer(input: input)
+    let parser = Parser(lexer: lexer)
+    guard let program = parser.parseProgram() else { return nil }
+    let env = Environment()
+    return eval(program, env)
 }

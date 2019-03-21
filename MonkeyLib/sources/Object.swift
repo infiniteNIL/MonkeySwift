@@ -18,6 +18,7 @@ public enum MonkeyObjectType: String {
     case builtinObj = "BUILTIN"
     case arrayObj = "ARRAY"
     case hashObj = "HASH"
+    case quoteObj = "QUOTE"
 }
 
 struct HashKey: Hashable {
@@ -208,3 +209,15 @@ protocol MonkeyHashable {
 extension MonkeyString: MonkeyHashable {}
 extension MonkeyInteger: MonkeyHashable {}
 extension MonkeyBoolean: MonkeyHashable {}
+
+struct MonkeyQuote: MonkeyObject {
+    let node: Node
+
+    func type() -> MonkeyObjectType {
+        return .quoteObj
+    }
+
+    func inspect() -> String {
+        return "QUOTE(" + node.description + ")"
+    }
+}
