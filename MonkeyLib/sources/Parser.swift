@@ -61,6 +61,7 @@ public class Parser {
         registerPrefix(tokenType: .function, fn: parseFunctionLiteral)
         registerPrefix(tokenType: .lbracket, fn: parseArrayLiteral)
         registerPrefix(tokenType: .lbrace, fn: parseHashLiteral)
+        registerPrefix(tokenType: .macro, fn: parseMacroLiteral)
 
         registerInfix(tokenType: .plus, fn: parseInfixExpression)
         registerInfix(tokenType: .minus, fn: parseInfixExpression)
@@ -303,6 +304,17 @@ public class Parser {
         guard expectPeek(.rparen) else { return nil }
 
         return identifiers
+    }
+
+    private func parseMacroLiteral() -> Expression? {
+        let token = currentToken
+
+        guard expectPeek(.lparen) else { return nil }
+        guard let parameters = parseFunctionParameters() else { return nil }
+        guard expectPeek(.lbrace) else { return nil }
+
+        let body = parseBlockStatement()
+        return MacroLiteral(token: token, parameters: parameters, body: body)
     }
 
     private func parseCallExpression(_ function: Expression) -> Expression? {

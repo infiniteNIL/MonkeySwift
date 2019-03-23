@@ -592,6 +592,34 @@ class ParserTests: XCTestCase {
         }
     }
 
+    func testMacroLiteralParsing() {
+        let input = "macro(x, y) { x + y; }"
+
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let program = parser.parseProgram()
+        XCTAssertNotNil(program)
+        checkParserErrors(parser)
+
+        XCTAssertEqual(program?.statements.count, 1)
+
+        let stmt = program?.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(stmt)
+
+        let macro = stmt?.expression as? MacroLiteral
+        XCTAssertNotNil(hash, "exp is not a MacroLiteral. got=\(String(describing: stmt?.expression))")
+        XCTAssertEqual(macro?.parameters.count, 2)
+
+        XCTAssertLiteralExpression(macro!.parameters[0], "x")
+        XCTAssertLiteralExpression(macro!.parameters[1], "y")
+
+        XCTAssertEqual(macro?.body.statements.count, 1)
+
+        let bodyStmt = macro?.body.statements[0] as? ExpressionStatement
+        XCTAssertNotNil(bodyStmt, "macro body stmt is not an ExpressionStmt")
+
+        XCTAssertInfixExpression(bodyStmt!.expression, "x", operator: "+", "y")
+    }
 
     func XCTAssertIdentifier(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(expr as? Identifier, "expression is not an Identifier. Got \(String(describing: expr))", file: file, line: line)

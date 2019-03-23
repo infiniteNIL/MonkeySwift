@@ -281,3 +281,16 @@ struct HashLiteral: Expression {
 
     func tokenLiteral() -> String { return token.literal }
 }
+
+struct MacroLiteral: Expression {
+    let token: Token
+    let parameters: [Identifier]
+    let body: BlockStatement
+
+    var description: String {
+        let paramStrings = parameters.map { $0.description }
+        return "\(tokenLiteral()) (" + paramStrings.joined(separator: ", ") + ") + \(body.description)"
+    }
+
+    func tokenLiteral() -> String { return token.literal }
+}
