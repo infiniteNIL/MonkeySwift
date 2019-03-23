@@ -64,7 +64,7 @@ struct Identifier: Expression {
 
 struct ReturnStatement: Statement {
     let token: Token
-    let returnValue: Expression?
+    var returnValue: Expression?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -78,7 +78,7 @@ struct ReturnStatement: Statement {
 
 struct ExpressionStatement: Statement, Expression {
     let token: Token
-    let expression: Expression?
+    var expression: Expression?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -90,8 +90,8 @@ struct ExpressionStatement: Statement, Expression {
 }
 
 struct IntegerLiteral: Expression {
-    let token: Token
-    let value: Int
+    var token: Token
+    var value: Int
 
     func tokenLiteral() -> String {
         return token.literal
@@ -99,6 +99,13 @@ struct IntegerLiteral: Expression {
 
     var description: String {
         return token.literal
+    }
+}
+
+extension IntegerLiteral {
+    init(value: Int) {
+        self.token = Token(type: .int, literal: "\(value)")
+        self.value = value
     }
 }
 
@@ -131,7 +138,7 @@ struct BooleanLiteral: Expression {
 struct PrefixExpression: Expression {
     let token: Token
     let `operator`: String
-    let right: Expression?
+    var right: Expression?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -145,9 +152,9 @@ struct PrefixExpression: Expression {
 
 struct InfixExpression: Expression {
     let token: Token
-    let left: Expression
+    var left: Expression
     let `operator`: String
-    let right: Expression?
+    var right: Expression?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -161,9 +168,9 @@ struct InfixExpression: Expression {
 
 struct IfExpression: Expression {
     let token: Token
-    let condition: Expression
-    let consequence: BlockStatement
-    let alternative: BlockStatement?
+    var condition: Expression
+    var consequence: BlockStatement
+    var alternative: BlockStatement?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -180,7 +187,7 @@ struct IfExpression: Expression {
 
 struct BlockStatement: Statement {
     let token: Token
-    let statements: [Statement]
+    var statements: [Statement]
 
     func tokenLiteral() -> String {
         return token.literal
@@ -195,8 +202,8 @@ struct BlockStatement: Statement {
 
 struct FunctionLiteral: Expression {
     let token: Token
-    let parameters: [Identifier]
-    let body: BlockStatement
+    var parameters: [Identifier]
+    var body: BlockStatement
 
     func tokenLiteral() -> String {
         return token.literal
@@ -231,7 +238,7 @@ struct CallExpression: Expression {
 
 struct ArrayLiteral: Expression {
     let token: Token
-    let elements: [Expression]
+    var elements: [Expression]
 
     func tokenLiteral() -> String {
         return token.literal
@@ -247,8 +254,8 @@ struct ArrayLiteral: Expression {
 
 struct IndexExpression: Expression {
     let token: Token    // The [
-    let left: Expression
-    let index: Expression
+    var left: Expression
+    var index: Expression
 
     func tokenLiteral() -> String {
         return token.literal
@@ -261,7 +268,7 @@ struct IndexExpression: Expression {
 
 struct HashLiteral: Expression {
     let token: Token
-    let pairs: [(Expression, Expression)]
+    var pairs: [(Expression, Expression)]
 
     var description: String {
         var pairStrings: [String] = []

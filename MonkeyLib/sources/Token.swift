@@ -10,7 +10,7 @@ import Foundation
 
 public struct Token {
     public let type: TokenType
-    public let literal: String
+    public var literal: String
 }
 
 public enum TokenType: String {

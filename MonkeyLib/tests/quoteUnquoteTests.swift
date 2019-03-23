@@ -37,4 +37,26 @@ class QuoteUnquoteTests: XCTestCase {
         }
     }
 
+    func testQuoteUnquote() {
+        struct Test {
+            let input: String
+            let expected: String
+        }
+
+        let tests = [
+            Test(input: "quote(unquote(4))", expected: "4"),
+            Test(input: "quote(unquote(4 + 4))", expected: "8"),
+            Test(input: "quote(8 + unquote(4 + 4))", expected: "(8 + 8)"),
+            Test(input: "quote(unquote(4 + 4) + 8)", expected: "(8 + 8)"),
+        ]
+
+        for t in tests {
+            let evaluated = testEval(t.input)
+            let quote = evaluated as? MonkeyQuote
+            XCTAssertNotNil(quote, "expected MonkeyQuote. got=\(String(describing: evaluated))")
+            XCTAssertNotNil(quote?.node, "quote.node is nil")
+            XCTAssertEqual(quote?.node.description, t.expected, "not equal. got=\(String(describing: quote?.node.description)), want=\(t.expected)")
+        }
+    }
+
 }
