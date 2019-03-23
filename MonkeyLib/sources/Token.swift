@@ -55,6 +55,7 @@ public enum TokenType: String {
     case `if` = "if"
     case `else` = "else"
     case `return` = "return"
+    case macro = "MACRO"
 }
 
 let keywords: [String: TokenType] = [
@@ -64,7 +65,8 @@ let keywords: [String: TokenType] = [
     "false":    .false,
     "if":       .if,
     "else":     .else,
-    "return":   .return
+    "return":   .return,
+    "macro":    .macro,
 ]
 
 func lookupIdentifier(_ ident: String) -> TokenType {
