@@ -96,6 +96,7 @@
 		DC99E3D5224339BC00783E0C /* modify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modify.swift; sourceTree = "<group>"; };
 		DC99E3D82246E01F00783E0C /* MacroExpansionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroExpansionTests.swift; sourceTree = "<group>"; };
 		DC99E3DA2246E2D400783E0C /* macroExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macroExpansion.swift; sourceTree = "<group>"; };
+		DC99E3DD2246FD3A00783E0C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +128,7 @@
 		DC5DFB00222B61680065253A = {
 			isa = PBXGroup;
 			children = (
+				DC99E3DD2246FD3A00783E0C /* README.md */,
 				DC5DFB0B222B61680065253A /* Monkey */,
 				DC5DFB15222B61AC0065253A /* MonkeyLib */,
 				DC5DFB94222B98420065253A /* MonkeyLib */,
