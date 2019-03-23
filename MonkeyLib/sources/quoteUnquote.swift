@@ -8,6 +8,68 @@
 
 import Foundation
 
-func quote(_ node: Node) -> MonkeyObject {
-    return MonkeyQuote(node: node)
+func quote(_ node: Node, _ env: Environment) -> MonkeyObject {
+    let newNode = evalUnquoteCalls(node, env)
+    return MonkeyQuote(node: newNode)
+}
+
+private func evalUnquoteCalls(_ quoted: Node, _ env: Environment) -> Node {
+    return modify(quoted) { node in
+        if !isUnquotedCall(node) {
+            return node
+        }
+
+        guard let call = node as? CallExpression else {
+            return node
+        }
+
+        if call.arguments.count != 1 {
+            return node
+        }
+
+        guard let unquoted = eval(call.arguments[0], env) else {
+            return node
+        }
+
+        guard let newNode = convertObjectToASTNode(unquoted) else {
+            return node
+        }
+
+        return newNode
+    }
+}
+
+private func isUnquotedCall(_ node: Node) -> Bool {
+    guard let callExpression = node as? CallExpression else {
+        return false
+    }
+
+    return callExpression.function.tokenLiteral() == "unquote"
+}
+
+private func convertObjectToASTNode(_ object: MonkeyObject) -> Node? {
+    switch object {
+    case is MonkeyInteger:
+        let integer = object as! MonkeyInteger
+        let t = Token(type: .int, literal: "\(integer.value)")
+        return IntegerLiteral(token: t, value: integer.value)
+
+    case is MonkeyBoolean:
+        let b = object as! MonkeyBoolean
+        let t: Token
+        if b.value {
+            t = Token(type: .true, literal: "true")
+        }
+        else {
+            t = Token(type: .false, literal: "false")
+        }
+        return BooleanLiteral(token: t, value: b.value)
+
+    case is MonkeyQuote:
+        let quote = object as! MonkeyQuote
+        return quote.node
+
+    default:
+        return nil
+    }
 }
