@@ -19,6 +19,7 @@ public enum MonkeyObjectType: String {
     case arrayObj = "ARRAY"
     case hashObj = "HASH"
     case quoteObj = "QUOTE"
+    case macroObj = "MACRO"
 }
 
 struct HashKey: Hashable {
@@ -151,6 +152,25 @@ struct Function: MonkeyObject {
         let params = parameters.map { $0.description }
         return """
             fn(\(params.joined(separator: ", "))) {
+                \(body.description)
+            }
+        """
+    }
+}
+
+struct Macro: MonkeyObject {
+    let parameters: [Identifier]
+    let body: BlockStatement
+    let env: Environment
+
+    public func type() -> MonkeyObjectType {
+        return .macroObj
+    }
+
+    public func inspect() -> String {
+        let params = parameters.map { $0.description }
+        return """
+            macro(\(params.joined(separator: ", "))) {
                 \(body.description)
             }
         """

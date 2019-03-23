@@ -11,6 +11,7 @@ let prompt = ">> "
 
 func startREPL() {
     let env = Environment()
+    let macroEnv = Environment()
 
     while true {
         print(prompt, terminator: "")
@@ -23,8 +24,10 @@ func startREPL() {
         if parser.errors.count > 0 {
             printParserErrors(parser.errors)
         }
-        else if let program = program {
-            if let evaluated = eval(program, env) {
+        else if var program = program {
+            defineMacros(&program, macroEnv)
+            let expanded = expandMacros(program, macroEnv)
+            if let evaluated = eval(expanded, env) {
                 print(evaluated.inspect())
             }
         }
