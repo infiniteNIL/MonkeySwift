@@ -42,6 +42,9 @@
 		DC99E3D92246E01F00783E0C /* MacroExpansionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3D82246E01F00783E0C /* MacroExpansionTests.swift */; };
 		DC99E3DB2246E2D400783E0C /* macroExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DA2246E2D400783E0C /* macroExpansion.swift */; };
 		DC99E3DC2246E2D400783E0C /* macroExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DA2246E2D400783E0C /* macroExpansion.swift */; };
+		DC99E3DF2246FE4D00783E0C /* code.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DE2246FE4D00783E0C /* code.swift */; };
+		DC99E3E02246FE4D00783E0C /* code.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DE2246FE4D00783E0C /* code.swift */; };
+		DC99E3E2224701CF00783E0C /* CodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3E1224701CF00783E0C /* CodeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +100,8 @@
 		DC99E3D82246E01F00783E0C /* MacroExpansionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroExpansionTests.swift; sourceTree = "<group>"; };
 		DC99E3DA2246E2D400783E0C /* macroExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macroExpansion.swift; sourceTree = "<group>"; };
 		DC99E3DD2246FD3A00783E0C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		DC99E3DE2246FE4D00783E0C /* code.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = code.swift; sourceTree = "<group>"; };
+		DC99E3E1224701CF00783E0C /* CodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +185,7 @@
 				DC99E3D022432E9B00783E0C /* quoteUnquote.swift */,
 				DC99E3D5224339BC00783E0C /* modify.swift */,
 				DC99E3DA2246E2D400783E0C /* macroExpansion.swift */,
+				DC99E3DE2246FE4D00783E0C /* code.swift */,
 			);
 			path = sources;
 			sourceTree = "<group>";
@@ -195,6 +201,7 @@
 				DC99E3CE22432B9000783E0C /* quoteUnquoteTests.swift */,
 				DC99E3D32243360E00783E0C /* ModifyTests.swift */,
 				DC99E3D82246E01F00783E0C /* MacroExpansionTests.swift */,
+				DC99E3E1224701CF00783E0C /* CodeTests.swift */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -362,6 +369,7 @@
 				DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */,
 				DC5DFB22222B62260065253A /* Object.swift in Sources */,
 				DC5DFBB622348B2C0065253A /* Environment.swift in Sources */,
+				DC99E3DF2246FE4D00783E0C /* code.swift in Sources */,
 				DC99E3D6224339BC00783E0C /* modify.swift in Sources */,
 				DC5DFB1E222B62260065253A /* Lexer.swift in Sources */,
 				DC5DFB20222B62260065253A /* AST.swift in Sources */,
@@ -374,6 +382,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC99E3E02246FE4D00783E0C /* code.swift in Sources */,
 				DC5DFBB2222B98670065253A /* Object.swift in Sources */,
 				DC5DFBB1222B98670065253A /* Parser.swift in Sources */,
 				DC5DFBB0222B98670065253A /* AST.swift in Sources */,
@@ -396,6 +405,7 @@
 				DC5DFBAA222B98600065253A /* ASTTests.swift in Sources */,
 				DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */,
 				DC99E3CD223EF99B00783E0C /* ObjectTests.swift in Sources */,
+				DC99E3E2224701CF00783E0C /* CodeTests.swift in Sources */,
 				DC5DFBAC222B98600065253A /* LexerTests.swift in Sources */,
 				DC5DFBAB222B98600065253A /* ParserTests.swift in Sources */,
 				DC5DFBAD222B98600065253A /* EvaluatorTests.swift in Sources */,
