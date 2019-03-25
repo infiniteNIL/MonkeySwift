@@ -45,6 +45,9 @@
 		DC99E3DF2246FE4D00783E0C /* code.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DE2246FE4D00783E0C /* code.swift */; };
 		DC99E3E02246FE4D00783E0C /* code.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3DE2246FE4D00783E0C /* code.swift */; };
 		DC99E3E2224701CF00783E0C /* CodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3E1224701CF00783E0C /* CodeTests.swift */; };
+		DC99E3E422483A7F00783E0C /* compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3E322483A7F00783E0C /* compiler.swift */; };
+		DC99E3E522483A7F00783E0C /* compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3E322483A7F00783E0C /* compiler.swift */; };
+		DC99E3E722483BB300783E0C /* CompilerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E3E622483BB300783E0C /* CompilerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +105,8 @@
 		DC99E3DD2246FD3A00783E0C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DC99E3DE2246FE4D00783E0C /* code.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = code.swift; sourceTree = "<group>"; };
 		DC99E3E1224701CF00783E0C /* CodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTests.swift; sourceTree = "<group>"; };
+		DC99E3E322483A7F00783E0C /* compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = compiler.swift; sourceTree = "<group>"; };
+		DC99E3E622483BB300783E0C /* CompilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +191,7 @@
 				DC99E3D5224339BC00783E0C /* modify.swift */,
 				DC99E3DA2246E2D400783E0C /* macroExpansion.swift */,
 				DC99E3DE2246FE4D00783E0C /* code.swift */,
+				DC99E3E322483A7F00783E0C /* compiler.swift */,
 			);
 			path = sources;
 			sourceTree = "<group>";
@@ -202,6 +208,7 @@
 				DC99E3D32243360E00783E0C /* ModifyTests.swift */,
 				DC99E3D82246E01F00783E0C /* MacroExpansionTests.swift */,
 				DC99E3E1224701CF00783E0C /* CodeTests.swift */,
+				DC99E3E622483BB300783E0C /* CompilerTests.swift */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -373,6 +380,7 @@
 				DC99E3D6224339BC00783E0C /* modify.swift in Sources */,
 				DC5DFB1E222B62260065253A /* Lexer.swift in Sources */,
 				DC5DFB20222B62260065253A /* AST.swift in Sources */,
+				DC99E3E422483A7F00783E0C /* compiler.swift in Sources */,
 				DC5DFB0D222B61680065253A /* main.swift in Sources */,
 				DC5DFB23222B62260065253A /* Token.swift in Sources */,
 			);
@@ -387,6 +395,7 @@
 				DC5DFBB1222B98670065253A /* Parser.swift in Sources */,
 				DC5DFBB0222B98670065253A /* AST.swift in Sources */,
 				DC99E3C9223C9D8300783E0C /* Builtins.swift in Sources */,
+				DC99E3E522483A7F00783E0C /* compiler.swift in Sources */,
 				DC99E3DC2246E2D400783E0C /* macroExpansion.swift in Sources */,
 				DC5DFBB522348B240065253A /* Environment.swift in Sources */,
 				DC99E3D222432E9B00783E0C /* quoteUnquote.swift in Sources */,
@@ -406,6 +415,7 @@
 				DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */,
 				DC99E3CD223EF99B00783E0C /* ObjectTests.swift in Sources */,
 				DC99E3E2224701CF00783E0C /* CodeTests.swift in Sources */,
+				DC99E3E722483BB300783E0C /* CompilerTests.swift in Sources */,
 				DC5DFBAC222B98600065253A /* LexerTests.swift in Sources */,
 				DC5DFBAB222B98600065253A /* ParserTests.swift in Sources */,
 				DC5DFBAD222B98600065253A /* EvaluatorTests.swift in Sources */,

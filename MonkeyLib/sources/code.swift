@@ -57,3 +57,62 @@ func make(op: Opcode, operands: [UInt16]) -> [UInt8] {
 
     return instruction
 }
+
+func string(instructions: Instructions) -> String {
+    var out = ""
+
+    var i = 0
+    while i < instructions.count {
+        guard let def = lookup(op: instructions[i]) else {
+            print("ERROR: \(instructions[i])")
+            continue
+        }
+
+        let (operands, read) = readOperands(def: def, ins: Array(instructions[(i+1)...]))
+        out.append("\(i) \(formatInstruction(def, operands))\n")
+
+        i += 1 + read
+    }
+
+    return out
+}
+
+private func formatInstruction(_ def: Definition, _ operands: [Int]) -> String {
+    let operandCount = def.operandWidths.count
+    guard operands.count == operandCount else {
+        return "ERROR: operand len \(operands.count) does not match defined \(operandCount)\n"
+    }
+
+    switch operandCount {
+    case 1:
+        return "\(def.name) \(operands[0])"
+
+    default:
+        break
+    }
+
+    return "ERROR: unhandled operandCount for \(def.name)\n"
+}
+
+func readOperands(def: Definition, ins: Instructions) -> ([Int], Int) {
+    var operands = Array<Int>(repeating: 0, count: def.operandWidths.count)
+    var offset = 0
+
+    for (i, width) in def.operandWidths.enumerated() {
+        switch width {
+        case 2:
+            operands[i] = Int(readUInt16(Array(ins[offset...])))
+
+        default:
+            break
+        }
+
+        offset += width
+    }
+
+    return (operands, offset)
+}
+
+func readUInt16(_ ins: Instructions) -> UInt16 {
+    return 0
+}
