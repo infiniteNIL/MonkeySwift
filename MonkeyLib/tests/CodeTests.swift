@@ -47,8 +47,8 @@ class CodeTests: XCTestCase {
         let expected = """
             0000 OpConstant 1
             0003 OpConstant 2
-            0006 Opconstant 65535
-        """
+            0006 OpConstant 65535\n
+            """
 
         var concatted = Instructions()
         for ins in instructions {

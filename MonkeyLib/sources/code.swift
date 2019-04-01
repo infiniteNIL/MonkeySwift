@@ -69,7 +69,7 @@ func string(instructions: Instructions) -> String {
         }
 
         let (operands, read) = readOperands(def: def, ins: Array(instructions[(i+1)...]))
-        out.append("\(i) \(formatInstruction(def, operands))\n")
+        out = out.appendingFormat("%04d %@\n", i, formatInstruction(def, operands))
 
         i += 1 + read
     }
@@ -114,5 +114,5 @@ func readOperands(def: Definition, ins: Instructions) -> ([Int], Int) {
 }
 
 func readUInt16(_ ins: Instructions) -> UInt16 {
-    return 0
+    return UInt16(ins[1]) | UInt16(ins[0]) << 8
 }
