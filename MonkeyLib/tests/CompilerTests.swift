@@ -40,7 +40,7 @@ class CompilerTests: XCTestCase {
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)
-            let compiler = Compiler()
+            var compiler = Compiler()
             let ok = compiler.compile(node: program)
             guard ok else {
                 fatalError("compiler error: \(ok)")
@@ -80,11 +80,9 @@ class CompilerTests: XCTestCase {
                 XCTAssertIntegerObject(Int64(constant as! Int), actual[i])
 
             default:
-                break
+                XCTFail()
             }
         }
-
-        XCTFail()
     }
 
     func XCTAssertIntegerObject(_ expected: Int64, _ actual: MonkeyObject, file: StaticString = #file, line: UInt = #line) {
