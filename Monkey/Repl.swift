@@ -37,8 +37,8 @@ func startREPL() {
         do {
             let machine = MonkeyVM(bytecode: compiler.bytecode())
             try machine.run()
-            let stackTop = machine.stackTop() ?? MonkeyNull()
-            print(stackTop.inspect())
+            let lastPoppped = machine.lastPopppedStackElem()
+            print(lastPoppped.inspect())
         }
         catch {
             print("Woops! Executing bytecode failed:\n \(error)")
