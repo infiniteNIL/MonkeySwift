@@ -11,7 +11,8 @@ import Foundation
 typealias Instructions = [UInt8]
 
 enum Opcode: UInt8 {
-    case opConstant
+    case constant
+    case add
 }
 
 struct Definition {
@@ -20,7 +21,8 @@ struct Definition {
 }
 
 let definitions: [Opcode: Definition] = [
-    .opConstant: Definition(name: "OpConstant", operandWidths: [2])
+    .constant: Definition(name: "Constant", operandWidths: [2]),
+    .add: Definition(name: "Add", operandWidths: [])
 ]
 
 func lookup(op: UInt8) -> Definition? {
@@ -84,8 +86,8 @@ private func formatInstruction(_ def: Definition, _ operands: [Int]) -> String {
     }
 
     switch operandCount {
-    case 1:
-        return "\(def.name) \(operands[0])"
+    case 0: return def.name
+    case 1: return "\(def.name) \(operands[0])"
 
     default:
         break

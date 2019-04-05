@@ -28,8 +28,9 @@ class CompilerTests: XCTestCase {
             Test(input: "1 + 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .opConstant, operands: [UInt16(0)]),
-                    make(op: .opConstant, operands: [UInt16(1)])
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .add, operands: [])
                 ]
             )
         ]
@@ -40,11 +41,8 @@ class CompilerTests: XCTestCase {
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)
-            var compiler = Compiler()
-            let ok = compiler.compile(node: program)
-            guard ok else {
-                fatalError("compiler error: \(ok)")
-            }
+            let compiler = Compiler()
+            try? compiler.compile(node: program)
 
             let bytecode = compiler.bytecode()
             XCTAssertInstructions(t.expectedInstructions, bytecode.instructions)

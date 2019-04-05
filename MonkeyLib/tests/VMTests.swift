@@ -26,7 +26,7 @@ class VMTests: XCTestCase {
         let tests = [
             VMTestCase(input: "1", expected: 1),
             VMTestCase(input: "2", expected: 2),
-            VMTestCase(input: "1 + 2", expected: 2) // FIXME
+            VMTestCase(input: "1 + 2", expected: 3)
         ]
 
         runVMTests(tests)
@@ -35,8 +35,8 @@ class VMTests: XCTestCase {
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!
-            var comp = Compiler()
-            XCTAssertTrue(comp.compile(node: program), "Compiler error")
+            let comp = Compiler()
+            try? comp.compile(node: program)
 
             let vm = MonkeyVM(bytecode: comp.bytecode())
             try? vm.run()

@@ -25,7 +25,8 @@ class CodeTests: XCTestCase {
         }
 
         let tests = [
-            Test(op: .opConstant, operands: [65534], expected: [Opcode.opConstant.rawValue, 255, 254])
+            Test(op: .constant, operands: [65534], expected: [Opcode.constant.rawValue, 255, 254]),
+            Test(op: .add, operands: [], expected: [Opcode.add.rawValue])
         ]
 
         for t in tests {
@@ -40,14 +41,14 @@ class CodeTests: XCTestCase {
 
     func testInstructionsString() {
         let instructions = [
-            make(op: .opConstant, operands: [1]),
-            make(op: .opConstant, operands: [2]),
-            make(op: .opConstant, operands: [65535])
+            make(op:. add, operands: []),
+            make(op: .constant, operands: [2]),
+            make(op: .constant, operands: [65535])
         ]
         let expected = """
-            0000 OpConstant 1
-            0003 OpConstant 2
-            0006 OpConstant 65535\n
+            0000 Add
+            0001 Constant 2
+            0004 Constant 65535\n
             """
 
         var concatted = Instructions()
@@ -66,7 +67,7 @@ class CodeTests: XCTestCase {
         }
 
         let tests = [
-            Test(op: .opConstant, operands: [65535], bytesRead: 2)
+            Test(op: .constant, operands: [65535], bytesRead: 2)
         ]
 
         for t in tests {

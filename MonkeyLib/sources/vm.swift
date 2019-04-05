@@ -40,11 +40,19 @@ class MonkeyVM {
             }
 
             switch op {
-            case .opConstant:
+            case .constant:
                 let bytes = Array(instructions[(ip + 1)...])
                 let constIndex = Int(readUInt16(bytes))
                 ip += 2
                 try push(constants[constIndex])
+
+            case .add:
+                let right = pop()
+                let left = pop()
+                let leftValue = (left as! MonkeyInteger).value
+                let rightValue = (right as! MonkeyInteger).value
+                let result = leftValue + rightValue
+                try push(MonkeyInteger(value: result))
             }
 
             ip += 1
@@ -56,5 +64,11 @@ class MonkeyVM {
 
         stack[sp] = o
         sp += 1
+    }
+
+    private func pop() -> MonkeyObject {
+        let o = stack[sp - 1]
+        sp -= 1
+        return o
     }
 }
