@@ -42,6 +42,33 @@ class CompilerTests: XCTestCase {
                     make(op: .constant, operands: [UInt16(1)]),
                     make(op: .pop, operands: []),
                 ]
+            ),
+            Test(input: "1 - 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .sub, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "1 * 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .mul, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "2 / 1",
+                 expectedConstants: [2, 1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .div, operands: []),
+                    make(op: .pop, operands: []),
+                ]
             )
         ]
 

@@ -12,6 +12,7 @@ private let StackSize = 2048
 
 enum MonkeyVMError: Error {
     case stackOverflow
+    case unsupportTypesForBinaryOperation(MonkeyObjectType, MonkeyObjectType)
 }
 
 class MonkeyVM {
@@ -45,13 +46,8 @@ class MonkeyVM {
                 ip += 2
                 try push(constants[constIndex])
 
-            case .add:
-                let right = pop()
-                let left = pop()
-                let leftValue = (left as! MonkeyInteger).value
-                let rightValue = (right as! MonkeyInteger).value
-                let result = leftValue + rightValue
-                try push(MonkeyInteger(value: result))
+            case .add, .sub, .mul, .div:
+                try executeBinaryOperation(op)
 
             case .pop:
                 _ = pop()
@@ -59,6 +55,38 @@ class MonkeyVM {
 
             ip += 1
         }
+    }
+
+    private func executeBinaryOperation(_ op: Opcode) throws {
+        let right = pop()
+        let left = pop()
+
+        let leftType = left.type()
+        let rightType = right.type()
+
+        if leftType == .integerObj && rightType == .integerObj {
+            try executeBinaryIntegerOperation(op, left, right)
+            return
+        }
+
+        throw MonkeyVMError.unsupportTypesForBinaryOperation(leftType, rightType)
+    }
+
+    private func executeBinaryIntegerOperation(_ op: Opcode, _ left: MonkeyObject, _ right: MonkeyObject) throws {
+        let leftValue = (left as! MonkeyInteger).value
+        let rightValue = (right as! MonkeyInteger).value
+        let result: Int
+
+        switch op {
+        case .add: result = leftValue + rightValue
+        case .sub: result = leftValue - rightValue
+        case .mul: result = leftValue * rightValue
+        case .div: result = leftValue / rightValue
+        default:
+            fatalError("Invalid integer operator: \(op)")
+        }
+
+        try push(MonkeyInteger(value: result))
     }
 
     private func push(_ o: MonkeyObject) throws {

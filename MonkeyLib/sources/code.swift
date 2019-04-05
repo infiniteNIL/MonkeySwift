@@ -14,6 +14,9 @@ enum Opcode: UInt8 {
     case constant
     case add
     case pop
+    case sub
+    case mul
+    case div
 }
 
 struct Definition {
@@ -24,7 +27,10 @@ struct Definition {
 let definitions: [Opcode: Definition] = [
     .constant:  Definition(name: "Constant", operandWidths: [2]),
     .add:       Definition(name: "Add", operandWidths: []),
-    .pop:       Definition(name: "Pop", operandWidths: [])
+    .pop:       Definition(name: "Pop", operandWidths: []),
+    .sub:       Definition(name: "Sub", operandWidths: []),
+    .mul:       Definition(name: "Mul", operandWidths: []),
+    .div:       Definition(name: "Div", operandWidths: []),
 ]
 
 func lookup(op: UInt8) -> Definition? {

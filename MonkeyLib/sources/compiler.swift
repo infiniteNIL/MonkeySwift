@@ -44,6 +44,9 @@ class Compiler {
 
             switch infix.operator {
             case "+":   _ = emit(op: .add, operands: [])
+            case "-":   _ = emit(op: .sub, operands: [])
+            case "*":   _ = emit(op: .mul, operands: [])
+            case "/":   _ = emit(op: .div, operands: [])
 
             default:
                 fatalError("Unknown operator \(infix.operator)")

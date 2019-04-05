@@ -26,7 +26,15 @@ class VMTests: XCTestCase {
         let tests = [
             VMTestCase(input: "1", expected: 1),
             VMTestCase(input: "2", expected: 2),
-            VMTestCase(input: "1 + 2", expected: 3)
+            VMTestCase(input: "1 - 2", expected: -1),
+            VMTestCase(input: "1 * 2", expected: 2),
+            VMTestCase(input: "4 / 2", expected: 2),
+            VMTestCase(input: "50 / 2 * 2 + 10 - 5", expected: 55),
+            VMTestCase(input: "5 + 5 + 5 + 5 - 10", expected: 10),
+            VMTestCase(input: "2 * 2 * 2 * 2 * 2", expected: 32),
+            VMTestCase(input: "5 * 2 + 10", expected: 20),
+            VMTestCase(input: "5 + 2 * 10", expected: 25),
+            VMTestCase(input: "5 * (2 + 10)", expected: 60),
         ]
 
         runVMTests(tests)
