@@ -13,6 +13,7 @@ typealias Instructions = [UInt8]
 enum Opcode: UInt8 {
     case constant
     case add
+    case pop
 }
 
 struct Definition {
@@ -21,8 +22,9 @@ struct Definition {
 }
 
 let definitions: [Opcode: Definition] = [
-    .constant: Definition(name: "Constant", operandWidths: [2]),
-    .add: Definition(name: "Add", operandWidths: [])
+    .constant:  Definition(name: "Constant", operandWidths: [2]),
+    .add:       Definition(name: "Add", operandWidths: []),
+    .pop:       Definition(name: "Pop", operandWidths: [])
 ]
 
 func lookup(op: UInt8) -> Definition? {

@@ -27,9 +27,8 @@ class MonkeyVM {
         sp = 0
     }
 
-    func stackTop() -> MonkeyObject? {
-        if sp == 0 { return nil }
-        return stack[sp - 1]
+    func lastPopppedStackElem() -> MonkeyObject {
+        return stack[sp]
     }
 
     func run() throws {
@@ -53,6 +52,9 @@ class MonkeyVM {
                 let rightValue = (right as! MonkeyInteger).value
                 let result = leftValue + rightValue
                 try push(MonkeyInteger(value: result))
+
+            case .pop:
+                _ = pop()
             }
 
             ip += 1

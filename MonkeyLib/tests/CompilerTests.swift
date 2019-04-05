@@ -30,7 +30,17 @@ class CompilerTests: XCTestCase {
                  expectedInstructions: [
                     make(op: .constant, operands: [UInt16(0)]),
                     make(op: .constant, operands: [UInt16(1)]),
-                    make(op: .add, operands: [])
+                    make(op: .add, operands: []),
+                    make(op: .pop, operands: [])
+                ]
+            ),
+            Test(input: "1; 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .pop, operands: []),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .pop, operands: []),
                 ]
             )
         ]

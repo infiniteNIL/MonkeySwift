@@ -41,9 +41,8 @@ class VMTests: XCTestCase {
             let vm = MonkeyVM(bytecode: comp.bytecode())
             try? vm.run()
 
-            let stackElem = vm.stackTop()
-            XCTAssertNotNil(stackElem)
-            testExpectedObject(t.expected, stackElem!)
+            let stackElem = vm.lastPopppedStackElem()
+            testExpectedObject(t.expected, stackElem)
         }
     }
 

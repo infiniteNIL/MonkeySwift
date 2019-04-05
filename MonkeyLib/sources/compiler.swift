@@ -31,6 +31,7 @@ class Compiler {
                 fatalError("Expresssion statement has no expression")
             }
             try compile(node: expr)
+            _ = emit(op: .pop, operands: [])
 
         case is InfixExpression:
             let infix = node as! InfixExpression
