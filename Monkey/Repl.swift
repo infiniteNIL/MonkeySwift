@@ -10,8 +10,8 @@ import Foundation
 let prompt = ">> "
 
 func startREPL() {
-    let env = Environment()
-    let macroEnv = Environment()
+//    let env = Environment()
+//    let macroEnv = Environment()
 
     while true {
         print(prompt, terminator: "")
@@ -23,7 +23,28 @@ func startREPL() {
         let program = parser.parseProgram()
         if parser.errors.count > 0 {
             printParserErrors(parser.errors)
+            continue
         }
+
+        let compiler = Compiler()
+        do {
+            try compiler.compile(node: program!)
+        }
+        catch {
+            print("Woops! Compilation failed:\n \(error)")
+        }
+
+        do {
+            let machine = MonkeyVM(bytecode: compiler.bytecode())
+            try machine.run()
+            let stackTop = machine.stackTop() ?? MonkeyNull()
+            print(stackTop.inspect())
+        }
+        catch {
+            print("Woops! Executing bytecode failed:\n \(error)")
+        }
+
+        /*
         else if var program = program {
             defineMacros(&program, macroEnv)
             let expanded = expandMacros(program, macroEnv)
@@ -31,6 +52,7 @@ func startREPL() {
                 print(evaluated.inspect())
             }
         }
+        */
 
         print()
     }
