@@ -17,6 +17,13 @@ enum Opcode: UInt8 {
     case sub
     case mul
     case div
+    case pushTrue
+    case pushFalse
+    case equal
+    case notEqual
+    case greaterThan
+    case minus
+    case bang
 }
 
 struct Definition {
@@ -25,12 +32,19 @@ struct Definition {
 }
 
 let definitions: [Opcode: Definition] = [
-    .constant:  Definition(name: "Constant", operandWidths: [2]),
-    .add:       Definition(name: "Add", operandWidths: []),
-    .pop:       Definition(name: "Pop", operandWidths: []),
-    .sub:       Definition(name: "Sub", operandWidths: []),
-    .mul:       Definition(name: "Mul", operandWidths: []),
-    .div:       Definition(name: "Div", operandWidths: []),
+    .constant:      Definition(name: "Constant", operandWidths: [2]),
+    .add:           Definition(name: "Add", operandWidths: []),
+    .pop:           Definition(name: "Pop", operandWidths: []),
+    .sub:           Definition(name: "Sub", operandWidths: []),
+    .mul:           Definition(name: "Mul", operandWidths: []),
+    .div:           Definition(name: "Div", operandWidths: []),
+    .pushTrue:      Definition(name: "True", operandWidths: []),
+    .pushFalse:     Definition(name: "False", operandWidths: []),
+    .equal:         Definition(name: "Equal", operandWidths: []),
+    .notEqual:      Definition(name: "NotEqual", operandWidths: []),
+    .greaterThan:   Definition(name: "GreaterThan", operandWidths: []),
+    .minus:         Definition(name: "Minus", operandWidths: []),
+    .bang:          Definition(name: "Bang", operandWidths: []),
 ]
 
 func lookup(op: UInt8) -> Definition? {

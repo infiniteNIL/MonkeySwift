@@ -69,7 +69,91 @@ class CompilerTests: XCTestCase {
                     make(op: .div, operands: []),
                     make(op: .pop, operands: []),
                 ]
-            )
+            ),
+            Test(input: "true",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "false",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushFalse, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "1 > 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .greaterThan, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "1 < 2",
+                 expectedConstants: [2, 1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .greaterThan, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "1 == 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .equal, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "1 != 2",
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .notEqual, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "true == false",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .pushFalse, operands: []),
+                    make(op: .equal, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "true != false",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .pushFalse, operands: []),
+                    make(op: .notEqual, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "-1",
+                 expectedConstants: [1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .minus, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "!true",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .bang, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
         ]
 
         runCompilerTests(tests)

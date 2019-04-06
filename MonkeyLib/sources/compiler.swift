@@ -31,22 +31,45 @@ class Compiler {
                 fatalError("Expresssion statement has no expression")
             }
             try compile(node: expr)
-            _ = emit(op: .pop, operands: [])
+            emit(op: .pop, operands: [])
 
-        case is InfixExpression:
-            let infix = node as! InfixExpression
-            try compile(node: infix.left)
-
-            guard let right = infix.right else {
-                fatalError("Infix expression has no right hand side")
+        case is PrefixExpression:
+            let prefix = node as! PrefixExpression
+            guard let right = prefix.right else {
+                fatalError("prefix expression has no right hand side")
             }
             try compile(node: right)
 
+            switch prefix.operator {
+            case "!": emit(op: .bang, operands: [])
+            case "-": emit(op: .minus, operands: [])
+            default:
+                fatalError("Invalid prefix operator: \(prefix.operator)")
+            }
+
+        case is InfixExpression:
+            let infix = node as! InfixExpression
+            guard let right = infix.right else {
+                fatalError("Infix expression has no right hand side")
+            }
+            if infix.operator == "<" {
+                try compile(node: right)
+                try compile(node: infix.left)
+                emit(op: .greaterThan, operands: [])
+                return
+            }
+
+            try compile(node: infix.left)
+            try compile(node: right)
+
             switch infix.operator {
-            case "+":   _ = emit(op: .add, operands: [])
-            case "-":   _ = emit(op: .sub, operands: [])
-            case "*":   _ = emit(op: .mul, operands: [])
-            case "/":   _ = emit(op: .div, operands: [])
+            case "+":   emit(op: .add, operands: [])
+            case "-":   emit(op: .sub, operands: [])
+            case "*":   emit(op: .mul, operands: [])
+            case "/":   emit(op: .div, operands: [])
+            case ">":   emit(op: .greaterThan, operands: [])
+            case "==":  emit(op: .equal, operands: [])
+            case "!=":  emit(op: .notEqual, operands: [])
 
             default:
                 fatalError("Unknown operator \(infix.operator)")
@@ -56,6 +79,10 @@ class Compiler {
             let intLiteral = node as! IntegerLiteral
             let integer = MonkeyInteger(value: intLiteral.value)
             _ = emit(op: .constant, operands: [addConstant(obj: integer)])
+
+        case is BooleanLiteral:
+            let boolLiteral = node as! BooleanLiteral
+            emit(op: boolLiteral.value ? .pushTrue : .pushFalse, operands: [])
 
         default:
             ()
@@ -71,6 +98,7 @@ class Compiler {
         return UInt16(constants.count - 1)
     }
 
+    @discardableResult
     func emit(op: Opcode, operands: [UInt16]) -> UInt16 {
         let ins = make(op: op, operands: operands)
         return addInstruction(ins)

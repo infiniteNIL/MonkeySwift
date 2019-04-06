@@ -50,11 +50,88 @@ class MonkeyVM {
                 try executeBinaryOperation(op)
 
             case .pop:
-                _ = pop()
+                pop()
+
+            case .pushTrue:
+                try push(True)
+
+            case .pushFalse:
+                try push(False)
+
+            case .equal, .notEqual, .greaterThan:
+                try executeComparison(op)
+
+            case .bang:
+                try executeBangOperator()
+
+            case .minus:
+                try executeMinusOperator()
             }
 
             ip += 1
         }
+    }
+
+    private func executeMinusOperator() throws {
+        let operand = pop()
+        guard operand.type() == .integerObj else {
+            fatalError("Unsupported type for negation")
+        }
+
+        let value = (operand as! MonkeyInteger).value
+        try push(MonkeyInteger(value: -value))
+    }
+
+    private func executeBangOperator() throws {
+        let operand = pop() as? MonkeyBoolean
+        if operand == True {
+            try push(False)
+        }
+        else if operand == False {
+            try push(True)
+        }
+        else {
+            try push(False)
+        }
+    }
+
+    private func executeComparison(_ op: Opcode) throws {
+        let right = pop()
+        let left = pop()
+
+        if left.type() == .integerObj && right.type() == .integerObj {
+            try executeIntegerComparison(op, left, right)
+            return
+        }
+
+        let rhs = (right as! MonkeyBoolean).value
+        let lhs = (left as! MonkeyBoolean).value
+
+        switch op {
+        case .equal:    return try push(nativeBoolToBooleanObject(rhs == lhs))
+        case .notEqual: return try push(nativeBoolToBooleanObject(rhs != lhs))
+
+        default:
+            fatalError("Invalid operator \(op) for comparison")
+        }
+    }
+
+    private func executeIntegerComparison(_ op: Opcode, _ left: MonkeyObject, _ right: MonkeyObject) throws {
+        let leftValue = (left as! MonkeyInteger).value
+        let rightValue = (right as! MonkeyInteger).value
+
+        switch op {
+        case .equal:        try push(nativeBoolToBooleanObject(rightValue == leftValue))
+        case .notEqual:     try push(nativeBoolToBooleanObject(rightValue != leftValue))
+        case .greaterThan:  try push(nativeBoolToBooleanObject(leftValue > rightValue))
+
+        default:
+            fatalError("Invalid operation: \(op)")
+        }
+    }
+
+    private func nativeBoolToBooleanObject(_ input: Bool) -> MonkeyBoolean {
+        return input ? True : False
     }
 
     private func executeBinaryOperation(_ op: Opcode) throws {
@@ -96,6 +173,7 @@ class MonkeyVM {
         sp += 1
     }
 
+    @discardableResult
     private func pop() -> MonkeyObject {
         let o = stack[sp - 1]
         sp -= 1
