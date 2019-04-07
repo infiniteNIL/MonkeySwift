@@ -58,6 +58,9 @@ class MonkeyVM {
             case .pushFalse:
                 try push(False)
 
+            case .null:
+                try push(Null)
+
             case .equal, .notEqual, .greaterThan:
                 try executeComparison(op)
 
@@ -66,9 +69,33 @@ class MonkeyVM {
 
             case .minus:
                 try executeMinusOperator()
+
+            case .jumpNotTruthy:
+                let bytes = Array(instructions[(ip + 1)...])
+                let pos = Int(readUInt16(bytes))
+                ip += 2
+                let condition = pop()
+                if !isTruthy(condition) {
+                    ip = pos - 1
+                }
+
+            case .jump:
+                let bytes = Array(instructions[(ip + 1)...])
+                let pos = Int(readUInt16(bytes))
+                ip = pos - 1
             }
 
             ip += 1
+        }
+    }
+
+    private func isTruthy(_ obj: MonkeyObject) -> Bool {
+        switch obj.type() {
+        case .booleanObj:   return (obj as! MonkeyBoolean).value
+        case .nullObj:      return false
+
+        default:
+            return true
         }
     }
 
@@ -83,11 +110,17 @@ class MonkeyVM {
     }
 
     private func executeBangOperator() throws {
-        let operand = pop() as? MonkeyBoolean
-        if operand == True {
-            try push(False)
+        let operand = pop()
+
+        if let bool = operand as? MonkeyBoolean {
+            if bool == True {
+                try push(False)
+            }
+            else {
+                try push(True)
+            }
         }
-        else if operand == False {
+        else if operand as? MonkeyNull != nil {
             try push(True)
         }
         else {

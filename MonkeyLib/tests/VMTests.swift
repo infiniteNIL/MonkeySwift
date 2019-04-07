@@ -71,6 +71,24 @@ class VMTests: XCTestCase {
         let tests = [
             VMTestCase(input: "true", expected: true),
             VMTestCase(input: "false", expected: false),
+            VMTestCase(input: "!(if (false) { 5; })", expected: true),
+        ]
+
+        runVMTests(tests)
+    }
+
+    func testConditionals() {
+        let tests = [
+            VMTestCase(input: "if (true) { 10 }", expected: 10),
+            VMTestCase(input: "if (true) { 10 } else { 20 }", expected: 10),
+            VMTestCase(input: "if (false) { 10 } else { 20 }", expected: 20),
+            VMTestCase(input: "if (1) { 10 }", expected: 10),
+            VMTestCase(input: "if (1 < 2) { 10 }", expected: 10),
+            VMTestCase(input: "if (1 < 2) { 10 } else { 20 }", expected: 10),
+            VMTestCase(input: "if (1 > 2) { 10 } else { 20 }", expected: 20),
+            VMTestCase(input: "if (1 > 2) { 10 }", expected: Null),
+            VMTestCase(input: "if (false) { 10 }", expected: Null),
+            VMTestCase(input: "if ((if (false) { 10 })) { 10 } else { 20 }", expected: 20),
         ]
 
         runVMTests(tests)
@@ -97,6 +115,9 @@ class VMTests: XCTestCase {
 
         case is Bool:
             XCTAssertBooleanObject(expected as! Bool, actual)
+
+        case is MonkeyNull:
+            XCTAssert(actual is MonkeyNull)
 
         default:
             XCTFail()

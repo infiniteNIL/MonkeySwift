@@ -159,6 +159,39 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testConditionals() {
+        let tests = [
+            Test(input: "if (true) { 10 }; 3333;",
+                 expectedConstants: [10, 3333] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .jumpNotTruthy, operands: [UInt16(10)]),
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .jump, operands: [UInt16(11)]),
+                    make(op: .null, operands: []),
+                    make(op: .pop, operands: []),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .pop, operands: [])
+                ]
+            ),
+            Test(input: "if (true) { 10 } else { 20 }; 3333;",
+                 expectedConstants: [10, 20, 3333] as [Any],
+                 expectedInstructions: [
+                    make(op: .pushTrue, operands: []),
+                    make(op: .jumpNotTruthy, operands: [UInt16(10)]),
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .jump, operands: [UInt16(13)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .pop, operands: []),
+                    make(op: .constant, operands: [UInt16(2)]),
+                    make(op: .pop, operands: [])
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)

@@ -24,6 +24,9 @@ enum Opcode: UInt8 {
     case greaterThan
     case minus
     case bang
+    case jumpNotTruthy
+    case jump
+    case null
 }
 
 struct Definition {
@@ -45,6 +48,9 @@ let definitions: [Opcode: Definition] = [
     .greaterThan:   Definition(name: "GreaterThan", operandWidths: []),
     .minus:         Definition(name: "Minus", operandWidths: []),
     .bang:          Definition(name: "Bang", operandWidths: []),
+    .jumpNotTruthy: Definition(name: "JumpNotTruthy", operandWidths: [2]),
+    .jump:          Definition(name: "Jump", operandWidths: [2]),
+    .null:          Definition(name: "Null", operandWidths: []),
 ]
 
 func lookup(op: UInt8) -> Definition? {

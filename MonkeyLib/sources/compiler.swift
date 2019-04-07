@@ -8,9 +8,16 @@
 
 import Foundation
 
+struct EmittedInstruction {
+    let opcode: Opcode
+    let position: Int
+}
+
 class Compiler {
     private var instructions: Instructions
     private var constants: [MonkeyObject]
+    private var lastInstruction: EmittedInstruction?
+    private var previousInstruction: EmittedInstruction?
 
     init() {
         instructions = []
@@ -75,6 +82,37 @@ class Compiler {
                 fatalError("Unknown operator \(infix.operator)")
             }
 
+        case is IfExpression:
+            let ifExpr = node as! IfExpression
+            try compile(node: ifExpr.condition)
+            let jumpNotTruthyPos = emit(op: .jumpNotTruthy, operands: [9999])
+            try compile(node: ifExpr.consequence)
+            if lastInstructionIsPop() {
+                removeLastPop()
+            }
+            let jumpPos = emit(op: .jump, operands: [9999])
+            let afterConsequencePos = instructions.count
+            changedOperand(opPos: Int(jumpNotTruthyPos), operand: afterConsequencePos)
+
+            if let alt = ifExpr.alternative {
+                try compile(node: alt)
+                if lastInstructionIsPop() {
+                    removeLastPop()
+                }
+            }
+            else {
+                emit(op: .null, operands: [])
+            }
+
+            let afterAlternativePos = instructions.count
+            changedOperand(opPos: Int(jumpPos), operand: afterAlternativePos)
+
+        case is BlockStatement:
+            let block = node as! BlockStatement
+            for s in block.statements {
+                try compile(node: s)
+            }
+
         case is IntegerLiteral:
             let intLiteral = node as! IntegerLiteral
             let integer = MonkeyInteger(value: intLiteral.value)
@@ -89,6 +127,30 @@ class Compiler {
         }
     }
 
+    private func changedOperand(opPos: Int, operand: Int) {
+        guard let op = Opcode(rawValue: instructions[opPos]) else {
+            fatalError("Invalid opcode")
+        }
+        let newInstruction = make(op: op, operands: [UInt16(operand)])
+        replaceInstruction(pos: opPos, newInstruction: newInstruction)
+    }
+
+    private func replaceInstruction(pos: Int, newInstruction: [UInt8]) {
+        for i in 0..<newInstruction.count {
+            instructions[pos + i] = newInstruction[i]
+        }
+    }
+
+    private func lastInstructionIsPop() -> Bool {
+        return lastInstruction?.opcode == .pop
+    }
+
+    private func removeLastPop() {
+        guard let last = lastInstruction else { fatalError("No last instruction") }
+        instructions = Array(instructions[..<last.position])
+        lastInstruction = previousInstruction
+    }
+
     func bytecode() -> Bytecode {
         return Bytecode(instructions: instructions, constants: constants)
     }
@@ -101,7 +163,15 @@ class Compiler {
     @discardableResult
     func emit(op: Opcode, operands: [UInt16]) -> UInt16 {
         let ins = make(op: op, operands: operands)
-        return addInstruction(ins)
+        let pos = addInstruction(ins)
+        setLastInstruction(op: op, pos: Int(pos))
+        return pos
+    }
+
+    private func setLastInstruction(op: Opcode, pos: Int) {
+        previousInstruction = lastInstruction
+        lastInstruction = EmittedInstruction(opcode: op, position: Int(pos))
+
     }
 
     private func addInstruction(_ ins: [UInt8]) -> UInt16 {
