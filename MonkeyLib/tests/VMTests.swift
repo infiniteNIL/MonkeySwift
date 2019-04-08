@@ -124,6 +124,16 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testHashLiterals() {
+        let tests = [
+            VMTestCase(input: "{}", expected: [:]),
+            VMTestCase(input: "{1: 2, 2: 3}", expected: [1: 2, 2: 3]),
+            VMTestCase(input: "{1 + 1: 2 * 2, 3 + 3: 4 * 4}", expected: [2: 4, 6: 16]),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!
@@ -159,6 +169,18 @@ class VMTests: XCTestCase {
             XCTAssertEqual(array?.elements.count, expectedArray.count)
             for (i, expectedElem) in expectedArray.enumerated() {
                 XCTAssertIntegerObject(Int64(expectedElem), array!.elements[i])
+            }
+
+        case is Dictionary<Int, Int>:
+            let expectedDict = expected as! Dictionary<Int, Int>
+            let hash = actual as? MonkeyHash
+            XCTAssertNotNil(hash, "object is not a hash. got=\(actual)")
+            XCTAssertEqual(hash?.pairs.count, expectedDict.keys.count)
+            for (expectedKey, expectedValue) in expectedDict {
+                let hashKey = HashKey(type: .integerObj, value: expectedKey)
+                let pair = hash?.pairs[hashKey]
+                XCTAssertNotNil(pair, "no pair given key in Pairs")
+                XCTAssertIntegerObject(Int64(expectedValue), pair!.value)
             }
 
         default:

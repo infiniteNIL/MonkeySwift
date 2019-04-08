@@ -118,10 +118,40 @@ class MonkeyVM {
                 let array = buildArray(sp - numElements, sp)
                 sp = sp - numElements
                 try push(array)
+
+            case .hash:
+                let bytes = Array(instructions[(ip + 1)...])
+                let numElements = Int(readUInt16(bytes))
+                ip += 2
+
+                let hash = buildHash(sp - numElements, sp)
+                sp = sp - numElements
+                try push(hash)
             }
 
             ip += 1
         }
+    }
+
+    private func buildHash(_ startIndex: Int, _ endIndex: Int) -> MonkeyObject {
+        var hashedPairs = [HashKey: HashPair]()
+
+        var i = startIndex
+        while i < endIndex {
+            let key = stack[i]
+            let value = stack[i + 1]
+            let pair = HashPair(key: key, value: value)
+            if let hashKey = key as? MonkeyHashable {
+                hashedPairs[hashKey.hashKey()] = pair
+            }
+            else {
+                fatalError("unusable as hash key: \(key.type())")
+            }
+
+            i += 2
+        }
+
+        return MonkeyHash(pairs: hashedPairs)
     }
 
     private func buildArray(_ startIndex: Int, _ endIndex: Int) -> MonkeyObject {

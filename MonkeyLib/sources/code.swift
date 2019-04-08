@@ -30,6 +30,7 @@ enum Opcode: UInt8 {
     case getGlobal
     case setGlobal
     case array
+    case hash
 }
 
 struct Definition {
@@ -57,6 +58,7 @@ let definitions: [Opcode: Definition] = [
     .getGlobal:     Definition(name: "GetGlobal", operandWidths: [2]),
     .setGlobal:     Definition(name: "SetGlobal", operandWidths: [2]),
     .array:         Definition(name: "Array", operandWidths: [2]),
+    .hash:          Definition(name: "Hash", operandWidths: [2]),
 ]
 
 func lookup(op: UInt8) -> Definition? {

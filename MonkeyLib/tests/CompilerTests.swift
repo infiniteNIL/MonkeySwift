@@ -301,6 +301,48 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testHashLiterals() {
+        let tests = [
+            Test(input: "{}",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .hash, operands: [0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "{1: 2, 3: 4, 5: 6}",
+                 expectedConstants: [1, 2, 3, 4, 5, 6] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .constant, operands: [3]),
+                    make(op: .constant, operands: [4]),
+                    make(op: .constant, operands: [5]),
+                    make(op: .hash, operands: [6]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "{1: 2 + 3, 4: 5 * 6}",
+                 expectedConstants: [1, 2, 3, 4, 5, 6] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .add, operands: []),
+                    make(op: .constant, operands: [3]),
+                    make(op: .constant, operands: [4]),
+                    make(op: .constant, operands: [5]),
+                    make(op: .mul, operands: []),
+                    make(op: .hash, operands: [4]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)

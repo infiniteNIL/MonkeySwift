@@ -159,9 +159,29 @@ class Compiler {
             }
             emit(op: .array, operands: [UInt16(array.elements.count)])
 
+        case is HashLiteral:
+            let hash = node as! HashLiteral
+            let keys = hash.pairs
+                .map { $0.0 }
+                .sorted { $0.description < $1.description }
+
+            for k in keys {
+                try compile(node: k)
+                let value = findValue(key: k, in: hash.pairs)
+                try compile(node: value)
+            }
+            emit(op: .hash, operands: [UInt16(hash.pairs.count * 2)])
+
         default:
             ()
         }
+    }
+
+    private func findValue(key: Expression, in pairs: [(Expression, Expression)]) -> Expression {
+        guard let pair = pairs.first(where: { $0.0.description == key.description }) else {
+            fatalError("Unable to find pair in hash")
+        }
+        return pair.1
     }
 
     private func changedOperand(opPos: Int, operand: Int) {
