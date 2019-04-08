@@ -152,6 +152,13 @@ class Compiler {
             let str = MonkeyString(value: s.value)
             emit(op: .constant, operands: [addConstant(obj: str)])
 
+        case is ArrayLiteral:
+            let array = node as! ArrayLiteral
+            for el in array.elements {
+                try compile(node: el)
+            }
+            emit(op: .array, operands: [UInt16(array.elements.count)])
+
         default:
             ()
         }

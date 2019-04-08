@@ -114,6 +114,16 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testArrayLiterals() {
+        let tests = [
+            VMTestCase(input: "[]", expected: []),
+            VMTestCase(input: "[1, 2, 3]", expected: [1, 2, 3]),
+            VMTestCase(input: "[1 + 2, 3 * 4, 5 + 6]", expected: [3, 12, 11]),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!
@@ -141,6 +151,15 @@ class VMTests: XCTestCase {
 
         case is String:
             XCTAssertStringObject(expected as! String, actual)
+
+        case is Array<Int>:
+            let expectedArray = expected as! Array<Int>
+            let array = actual as? MonkeyArray
+            XCTAssertNotNil(array)
+            XCTAssertEqual(array?.elements.count, expectedArray.count)
+            for (i, expectedElem) in expectedArray.enumerated() {
+                XCTAssertIntegerObject(Int64(expectedElem), array!.elements[i])
+            }
 
         default:
             XCTFail()

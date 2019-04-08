@@ -109,10 +109,27 @@ class MonkeyVM {
                 else {
                     fatalError("Invalid global index")
                 }
+
+            case .array:
+                let bytes = Array(instructions[(ip + 1)...])
+                let numElements = Int(readUInt16(bytes))
+                ip += 2
+
+                let array = buildArray(sp - numElements, sp)
+                sp = sp - numElements
+                try push(array)
             }
 
             ip += 1
         }
+    }
+
+    private func buildArray(_ startIndex: Int, _ endIndex: Int) -> MonkeyObject {
+        var elements = [MonkeyObject?].init(repeating: nil, count: endIndex - startIndex)
+        for i in startIndex..<endIndex {
+            elements[i - startIndex] = stack[i]
+        }
+        return MonkeyArray(elements: elements as! [MonkeyObject])
     }
 
     private func isTruthy(_ obj: MonkeyObject) -> Bool {

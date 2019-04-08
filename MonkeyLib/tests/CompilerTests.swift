@@ -28,8 +28,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 + 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .add, operands: []),
                     make(op: .pop, operands: [])
                 ]
@@ -37,17 +37,17 @@ class CompilerTests: XCTestCase {
             Test(input: "1; 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [0]),
                     make(op: .pop, operands: []),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [1]),
                     make(op: .pop, operands: []),
                 ]
             ),
             Test(input: "1 - 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .sub, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -55,8 +55,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 * 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .mul, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -64,8 +64,8 @@ class CompilerTests: XCTestCase {
             Test(input: "2 / 1",
                  expectedConstants: [2, 1] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .div, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -87,8 +87,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 > 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .greaterThan, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -96,8 +96,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 < 2",
                  expectedConstants: [2, 1] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .greaterThan, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -105,8 +105,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 == 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .equal, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -114,8 +114,8 @@ class CompilerTests: XCTestCase {
             Test(input: "1 != 2",
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .notEqual, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -141,7 +141,7 @@ class CompilerTests: XCTestCase {
             Test(input: "-1",
                  expectedConstants: [1] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [0]),
                     make(op: .minus, operands: []),
                     make(op: .pop, operands: []),
                 ]
@@ -165,12 +165,12 @@ class CompilerTests: XCTestCase {
                  expectedConstants: [10, 3333] as [Any],
                  expectedInstructions: [
                     make(op: .pushTrue, operands: []),
-                    make(op: .jumpNotTruthy, operands: [UInt16(10)]),
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .jump, operands: [UInt16(11)]),
+                    make(op: .jumpNotTruthy, operands: [10]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .jump, operands: [11]),
                     make(op: .null, operands: []),
                     make(op: .pop, operands: []),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [1]),
                     make(op: .pop, operands: [])
                 ]
             ),
@@ -178,12 +178,12 @@ class CompilerTests: XCTestCase {
                  expectedConstants: [10, 20, 3333] as [Any],
                  expectedInstructions: [
                     make(op: .pushTrue, operands: []),
-                    make(op: .jumpNotTruthy, operands: [UInt16(10)]),
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .jump, operands: [UInt16(13)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .jumpNotTruthy, operands: [10]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .jump, operands: [13]),
+                    make(op: .constant, operands: [1]),
                     make(op: .pop, operands: []),
-                    make(op: .constant, operands: [UInt16(2)]),
+                    make(op: .constant, operands: [2]),
                     make(op: .pop, operands: [])
                 ]
             ),
@@ -200,10 +200,10 @@ class CompilerTests: XCTestCase {
                     """,
                  expectedConstants: [1, 2] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .setGlobal, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
-                    make(op: .setGlobal, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .setGlobal, operands: [1]),
                 ]
             ),
             Test(input: """
@@ -212,9 +212,9 @@ class CompilerTests: XCTestCase {
                     """,
                  expectedConstants: [1] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .setGlobal, operands: [UInt16(0)]),
-                    make(op: .getGlobal, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -225,11 +225,11 @@ class CompilerTests: XCTestCase {
                     """,
                  expectedConstants: [1] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .setGlobal, operands: [UInt16(0)]),
-                    make(op: .getGlobal, operands: [UInt16(0)]),
-                    make(op: .setGlobal, operands: [UInt16(1)]),
-                    make(op: .getGlobal, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .setGlobal, operands: [1]),
+                    make(op: .getGlobal, operands: [1]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -250,9 +250,49 @@ class CompilerTests: XCTestCase {
             Test(input: "\"mon\" + \"key\"",
                  expectedConstants: ["mon", "key"] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [UInt16(0)]),
-                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
                     make(op: .add, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testArrayLiterals() {
+        let tests = [
+            Test(input: "[]",
+                 expectedConstants: [] as [Any],
+                 expectedInstructions: [
+                    make(op: .array, operands: [0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "[1, 2, 3]",
+                 expectedConstants: [1, 2, 3] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .array, operands: [3]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "[1 + 2, 3 - 4, 5 * 6]",
+                 expectedConstants: [1, 2, 3, 4, 5, 6] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .add, operands: []),
+                    make(op: .constant, operands: [2]),
+                    make(op: .constant, operands: [3]),
+                    make(op: .sub, operands: []),
+                    make(op: .constant, operands: [4]),
+                    make(op: .constant, operands: [5]),
+                    make(op: .mul, operands: []),
+                    make(op: .array, operands: [3]),
                     make(op: .pop, operands: []),
                 ]
             ),
