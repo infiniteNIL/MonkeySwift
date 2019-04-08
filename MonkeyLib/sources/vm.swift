@@ -127,9 +127,52 @@ class MonkeyVM {
                 let hash = buildHash(sp - numElements, sp)
                 sp = sp - numElements
                 try push(hash)
+
+            case .index:
+                let index = pop()
+                let left = pop()
+                try executeIndexExpression(left, index)
             }
 
             ip += 1
+        }
+    }
+
+    private func executeIndexExpression(_ left: MonkeyObject, _ index: MonkeyObject) throws {
+        if left.type() == .arrayObj && index.type() == .integerObj {
+            try executeArrayIndex(left, index)
+        }
+        else if left.type() == .hashObj {
+            try executeHashIndex(left, index)
+        }
+        else {
+            fatalError("index operator not supported: \(left.type())")
+        }
+    }
+
+    private func executeArrayIndex(_ array: MonkeyObject, _ index: MonkeyObject) throws {
+        let arrayObject = array as! MonkeyArray
+        let i = (index as! MonkeyInteger).value
+        let max = arrayObject.elements.count - 1
+        if i < 0 || i > max {
+            try push(Null)
+        }
+        else {
+            try push(arrayObject.elements[i])
+        }
+    }
+
+    private func executeHashIndex(_ hash: MonkeyObject, _ index: MonkeyObject) throws {
+        let hashObject = hash as! MonkeyHash
+        guard let key = index as? MonkeyHashable else {
+            fatalError("Unusable as hash key: \(index.type())")
+        }
+        
+        if let pair = hashObject.pairs[key.hashKey()] {
+            try push(pair.value)
+        }
+        else {
+            try push(Null)
         }
     }
 

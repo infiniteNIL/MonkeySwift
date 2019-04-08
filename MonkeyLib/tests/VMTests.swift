@@ -134,6 +134,23 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testIndexExpressions() {
+        let tests = [
+            VMTestCase(input: "[1, 2, 3][1]", expected: 2),
+            VMTestCase(input: "[1, 2, 3][0 + 2]", expected: 3),
+            VMTestCase(input: "[[1, 1, 1]][0][0]", expected: 1),
+            VMTestCase(input: "[][0]", expected: Null),
+            VMTestCase(input: "[1, 2, 3][99]", expected: Null),
+            VMTestCase(input: "[1][-1]", expected: Null),
+            VMTestCase(input: "{1: 1, 2: 2}[1]", expected: 1),
+            VMTestCase(input: "{1: 1, 2: 2}[2]", expected: 2),
+            VMTestCase(input: "{1: 1}[0]", expected: Null),
+            VMTestCase(input: "{}[0]", expected: Null),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!

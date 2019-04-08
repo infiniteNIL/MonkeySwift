@@ -343,6 +343,40 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testIndexExpressions() {
+        let tests = [
+            Test(input: "[1, 2, 3][1 + 1]",
+                 expectedConstants: [1, 2, 3, 1, 1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .array, operands: [3]),
+                    make(op: .constant, operands: [3]),
+                    make(op: .constant, operands: [4]),
+                    make(op: .add, operands: []),
+                    make(op: .index, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "{1: 2}[2 - 1]",
+                 expectedConstants: [1, 2, 2, 1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .hash, operands: [2]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .constant, operands: [3]),
+                    make(op: .sub, operands: []),
+                    make(op: .index, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)

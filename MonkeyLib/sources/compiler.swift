@@ -172,6 +172,12 @@ class Compiler {
             }
             emit(op: .hash, operands: [UInt16(hash.pairs.count * 2)])
 
+        case is IndexExpression:
+            let indexExpr = node as! IndexExpression
+            try compile(node: indexExpr.left)
+            try compile(node: indexExpr.index)
+            emit(op: .index, operands: [])
+
         default:
             ()
         }
