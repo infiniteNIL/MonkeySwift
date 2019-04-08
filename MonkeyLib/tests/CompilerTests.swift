@@ -192,6 +192,52 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testGlobalLetStatements() {
+        let tests = [
+            Test(input: """
+                    let one = 1;
+                    let two = 2;
+                    """,
+                 expectedConstants: [1, 2] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .setGlobal, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .setGlobal, operands: [UInt16(1)]),
+                ]
+            ),
+            Test(input: """
+                    let one = 1;
+                    one;
+                    """,
+                 expectedConstants: [1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .setGlobal, operands: [UInt16(0)]),
+                    make(op: .getGlobal, operands: [UInt16(0)]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: """
+                    let one = 1;
+                    let two = one;
+                    two;
+                    """,
+                 expectedConstants: [1] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .setGlobal, operands: [UInt16(0)]),
+                    make(op: .getGlobal, operands: [UInt16(0)]),
+                    make(op: .setGlobal, operands: [UInt16(1)]),
+                    make(op: .getGlobal, operands: [UInt16(1)]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)

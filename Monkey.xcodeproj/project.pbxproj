@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC36FDAB225AC9EF00069BDA /* SymbolTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC36FDAA225AC9EF00069BDA /* SymbolTable.swift */; };
+		DC36FDAC225AC9EF00069BDA /* SymbolTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC36FDAA225AC9EF00069BDA /* SymbolTable.swift */; };
+		DC36FDAE225B9EF800069BDA /* SymbolTableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC36FDAD225B9EF800069BDA /* SymbolTableTests.swift */; };
 		DC5DFB0D222B61680065253A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB0C222B61680065253A /* main.swift */; };
 		DC5DFB14222B61980065253A /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB13222B61980065253A /* Repl.swift */; };
 		DC5DFB1E222B62260065253A /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5DFB18222B62250065253A /* Lexer.swift */; };
@@ -76,6 +79,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DC36FDAA225AC9EF00069BDA /* SymbolTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolTable.swift; sourceTree = "<group>"; };
+		DC36FDAD225B9EF800069BDA /* SymbolTableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolTableTests.swift; sourceTree = "<group>"; };
 		DC5DFB09222B61680065253A /* Monkey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Monkey; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC5DFB0C222B61680065253A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		DC5DFB13222B61980065253A /* Repl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
@@ -197,6 +202,7 @@
 				DC99E3DA2246E2D400783E0C /* macroExpansion.swift */,
 				DC99E3DE2246FE4D00783E0C /* code.swift */,
 				DC99E3E322483A7F00783E0C /* compiler.swift */,
+				DC36FDAA225AC9EF00069BDA /* SymbolTable.swift */,
 				DC9FC1572257FCE0009D8FD4 /* vm.swift */,
 			);
 			path = sources;
@@ -216,6 +222,7 @@
 				DC99E3E1224701CF00783E0C /* CodeTests.swift */,
 				DC99E3E622483BB300783E0C /* CompilerTests.swift */,
 				DC9FC1552257F8EF009D8FD4 /* VMTests.swift */,
+				DC36FDAD225B9EF800069BDA /* SymbolTableTests.swift */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -385,6 +392,7 @@
 				DC99E3D122432E9B00783E0C /* quoteUnquote.swift in Sources */,
 				DC99E3DB2246E2D400783E0C /* macroExpansion.swift in Sources */,
 				DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */,
+				DC36FDAB225AC9EF00069BDA /* SymbolTable.swift in Sources */,
 				DC9FC1582257FCE0009D8FD4 /* vm.swift in Sources */,
 				DC5DFB22222B62260065253A /* Object.swift in Sources */,
 				DC5DFBB622348B2C0065253A /* Environment.swift in Sources */,
@@ -414,6 +422,7 @@
 				DC99E3D222432E9B00783E0C /* quoteUnquote.swift in Sources */,
 				DC5DFBB3222B98670065253A /* Token.swift in Sources */,
 				DC99E3D7224339BC00783E0C /* modify.swift in Sources */,
+				DC36FDAC225AC9EF00069BDA /* SymbolTable.swift in Sources */,
 				DC5DFBAE222B98670065253A /* Lexer.swift in Sources */,
 				DC5DFBAF222B98670065253A /* Evaluator.swift in Sources */,
 			);
@@ -425,6 +434,7 @@
 			files = (
 				DC99E3CF22432B9000783E0C /* quoteUnquoteTests.swift in Sources */,
 				DC5DFBAA222B98600065253A /* ASTTests.swift in Sources */,
+				DC36FDAE225B9EF800069BDA /* SymbolTableTests.swift in Sources */,
 				DC5DFBA1222B98430065253A /* MonkeyLibTests.swift in Sources */,
 				DC99E3CD223EF99B00783E0C /* ObjectTests.swift in Sources */,
 				DC99E3E2224701CF00783E0C /* CodeTests.swift in Sources */,

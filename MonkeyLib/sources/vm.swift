@@ -83,6 +83,8 @@ class MonkeyVM {
                 let bytes = Array(instructions[(ip + 1)...])
                 let pos = Int(readUInt16(bytes))
                 ip = pos - 1
+
+            case .getGlobal, .setGlobal: ()
             }
 
             ip += 1

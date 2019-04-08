@@ -27,6 +27,8 @@ enum Opcode: UInt8 {
     case jumpNotTruthy
     case jump
     case null
+    case getGlobal
+    case setGlobal
 }
 
 struct Definition {
@@ -51,6 +53,8 @@ let definitions: [Opcode: Definition] = [
     .jumpNotTruthy: Definition(name: "JumpNotTruthy", operandWidths: [2]),
     .jump:          Definition(name: "Jump", operandWidths: [2]),
     .null:          Definition(name: "Null", operandWidths: []),
+    .getGlobal:     Definition(name: "GetGlobal", operandWidths: [2]),
+    .setGlobal:     Definition(name: "SetGlobal", operandWidths: [2]),
 ]
 
 func lookup(op: UInt8) -> Definition? {

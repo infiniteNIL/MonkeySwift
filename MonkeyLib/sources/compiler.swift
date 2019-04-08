@@ -113,6 +113,10 @@ class Compiler {
                 try compile(node: s)
             }
 
+        case is LetStatement:
+            let letStmt = node as! LetStatement
+            try compile(node: letStmt.value!)
+
         case is IntegerLiteral:
             let intLiteral = node as! IntegerLiteral
             let integer = MonkeyInteger(value: intLiteral.value)
