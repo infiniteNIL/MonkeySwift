@@ -94,6 +94,16 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testGlobalLetStatements() {
+        let tests = [
+            VMTestCase(input: "let one = 1; one", expected: 1),
+            VMTestCase(input: "let one = 1; let two = 2; one + two", expected: 3),
+            VMTestCase(input: "let one = 1; let two = one + one; one + two", expected: 3),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!

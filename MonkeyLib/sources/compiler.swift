@@ -13,15 +13,27 @@ struct EmittedInstruction {
     let position: Int
 }
 
+enum CompilerError: Error {
+    case undefinedVariable(String)
+}
+
 class Compiler {
     private var instructions: Instructions
     private var constants: [MonkeyObject]
     private var lastInstruction: EmittedInstruction?
     private var previousInstruction: EmittedInstruction?
+    private(set) var symbolTable: SymbolTable
 
     init() {
         instructions = []
         constants = []
+        symbolTable = SymbolTable()
+    }
+
+    init(symbolTable: SymbolTable, constants: [MonkeyObject]) {
+        instructions = []
+        self.constants = constants
+        self.symbolTable = symbolTable
     }
     
     func compile(node: Node) throws {
@@ -116,6 +128,15 @@ class Compiler {
         case is LetStatement:
             let letStmt = node as! LetStatement
             try compile(node: letStmt.value!)
+            let symbol = symbolTable.define(name: letStmt.name.value)
+            emit(op: .setGlobal, operands: [UInt16(symbol.index)])
+
+        case is Identifier:
+            let ident = node as! Identifier
+            guard let symbol = symbolTable.resolve(name: ident.value) else {
+                throw CompilerError.undefinedVariable(ident.value)
+            }
+            emit(op: .getGlobal, operands: [UInt16(symbol.index)])
 
         case is IntegerLiteral:
             let intLiteral = node as! IntegerLiteral

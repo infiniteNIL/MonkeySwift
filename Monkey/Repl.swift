@@ -13,6 +13,10 @@ func startREPL() {
 //    let env = Environment()
 //    let macroEnv = Environment()
 
+    var constants = [MonkeyObject]()
+    var globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
+    var symbolTable = SymbolTable()
+
     while true {
         print(prompt, terminator: "")
 
@@ -26,7 +30,7 @@ func startREPL() {
             continue
         }
 
-        let compiler = Compiler()
+        let compiler = Compiler(symbolTable: symbolTable, constants: constants)
         do {
             try compiler.compile(node: program!)
         }
@@ -35,10 +39,16 @@ func startREPL() {
         }
 
         do {
-            let machine = MonkeyVM(bytecode: compiler.bytecode())
+            let code = compiler.bytecode()
+            constants = code.constants
+            symbolTable = compiler.symbolTable
+            
+            let machine = MonkeyVM(bytecode: code, globals: globals)
             try machine.run()
             let lastPoppped = machine.lastPopppedStackElem()
             print(lastPoppped.inspect())
+
+            globals = machine.globals
         }
         catch {
             print("Woops! Executing bytecode failed:\n \(error)")

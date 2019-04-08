@@ -9,6 +9,7 @@
 import Foundation
 
 private let StackSize = 2048
+public let GlobalConstantsSize = 65536
 
 enum MonkeyVMError: Error {
     case stackOverflow
@@ -16,16 +17,23 @@ enum MonkeyVMError: Error {
 }
 
 class MonkeyVM {
-    let constants: [MonkeyObject]
-    let instructions: Instructions
-    var stack: [MonkeyObject]
-    var sp: Int // Always points to the next value. Top of stack is stack[sp-1]
+    private let constants: [MonkeyObject]
+    private let instructions: Instructions
+    private var stack: [MonkeyObject]
+    private var sp: Int // Always points to the next value. Top of stack is stack[sp-1]
+    private(set) var globals: [MonkeyObject?]
 
     init(bytecode: Bytecode) {
         instructions = bytecode.instructions
         constants = bytecode.constants
         stack = [MonkeyObject](repeating: MonkeyNull(), count: StackSize)
         sp = 0
+        globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
+    }
+
+    convenience init(bytecode: Bytecode, globals: [MonkeyObject?]) {
+        self.init(bytecode: bytecode)
+        self.globals = globals
     }
 
     func lastPopppedStackElem() -> MonkeyObject {
@@ -84,7 +92,22 @@ class MonkeyVM {
                 let pos = Int(readUInt16(bytes))
                 ip = pos - 1
 
-            case .getGlobal, .setGlobal: ()
+            case .setGlobal:
+                let bytes = Array(instructions[(ip + 1)...])
+                let globalIndex = Int(readUInt16(bytes))
+                ip += 2
+                globals[globalIndex] = pop()
+
+            case .getGlobal: ()
+                let bytes = Array(instructions[(ip + 1)...])
+                let globalIndex = Int(readUInt16(bytes))
+                ip += 2
+                if let global = globals[globalIndex] {
+                    try push(global)
+                }
+                else {
+                    fatalError("Invalid global index")
+                }
             }
 
             ip += 1
