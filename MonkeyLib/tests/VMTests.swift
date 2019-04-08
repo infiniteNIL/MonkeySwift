@@ -104,6 +104,16 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testStringExpressions() {
+        let tests = [
+            VMTestCase(input: "\"monkey\"", expected: "monkey"),
+            VMTestCase(input: "\"mon\" + \"key\"", expected: "monkey"),
+            VMTestCase(input: "\"mon\" + \"key\" + \"banana\"", expected: "monkeybanana"),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!
@@ -129,6 +139,9 @@ class VMTests: XCTestCase {
         case is MonkeyNull:
             XCTAssert(actual is MonkeyNull)
 
+        case is String:
+            XCTAssertStringObject(expected as! String, actual)
+
         default:
             XCTFail()
         }
@@ -153,4 +166,10 @@ class VMTests: XCTestCase {
         XCTAssertEqual(result!.value, expected, "object has wrong value. got \(result!.value), want \(expected)", file: file, line: line)
     }
 
+    func XCTAssertStringObject(_ expected: String, _ actual: MonkeyObject, file: StaticString = #file, line: UInt = #line) {
+        let result = actual as? MonkeyString
+        XCTAssertNotNil(result, "object is not a String. got \(actual)", file: file, line: line)
+        guard result != nil else { return }
+        XCTAssertEqual(result!.value, expected, "object has wrong value. got \(result!.value), want \(expected)", file: file, line: line)
+    }
 }

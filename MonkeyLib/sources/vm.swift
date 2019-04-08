@@ -14,6 +14,7 @@ public let GlobalConstantsSize = 65536
 enum MonkeyVMError: Error {
     case stackOverflow
     case unsupportTypesForBinaryOperation(MonkeyObjectType, MonkeyObjectType)
+    case unknownStringOperator(UInt8)
 }
 
 class MonkeyVM {
@@ -201,10 +202,13 @@ class MonkeyVM {
 
         if leftType == .integerObj && rightType == .integerObj {
             try executeBinaryIntegerOperation(op, left, right)
-            return
         }
-
-        throw MonkeyVMError.unsupportTypesForBinaryOperation(leftType, rightType)
+        else if leftType == .stringObj && rightType == .stringObj {
+            try executeBinaryStringOperation(op, left, right)
+        }
+        else {
+            throw MonkeyVMError.unsupportTypesForBinaryOperation(leftType, rightType)
+        }
     }
 
     private func executeBinaryIntegerOperation(_ op: Opcode, _ left: MonkeyObject, _ right: MonkeyObject) throws {
@@ -222,6 +226,14 @@ class MonkeyVM {
         }
 
         try push(MonkeyInteger(value: result))
+    }
+
+    private func executeBinaryStringOperation(_ op: Opcode, _ left: MonkeyObject, _ right: MonkeyObject) throws {
+        guard op == .add else { throw MonkeyVMError.unknownStringOperator(op.rawValue) }
+
+        let leftValue = (left as! MonkeyString).value
+        let rightValue = (right as! MonkeyString).value
+        try push(MonkeyString(value: leftValue + rightValue))
     }
 
     private func push(_ o: MonkeyObject) throws {

@@ -238,6 +238,29 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testStringExpressions() {
+        let tests = [
+            Test(input: "\"monkey\"",
+                 expectedConstants: ["monkey"] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "\"mon\" + \"key\"",
+                 expectedConstants: ["mon", "key"] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [UInt16(0)]),
+                    make(op: .constant, operands: [UInt16(1)]),
+                    make(op: .add, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)
@@ -277,6 +300,9 @@ class CompilerTests: XCTestCase {
             case is Int:
                 XCTAssertIntegerObject(Int64(constant as! Int), actual[i])
 
+            case is String:
+                XCTAssertStringObject(constant as! String, actual[i])
+
             default:
                 XCTFail()
             }
@@ -287,6 +313,12 @@ class CompilerTests: XCTestCase {
         let result = actual as? MonkeyInteger
         XCTAssertNotNil(result, file: file, line: line)
         XCTAssertEqual(result?.value, Int(expected), file: file, line: line)
+    }
+
+    func XCTAssertStringObject(_ expected: String, _ actual: MonkeyObject, file: StaticString = #file, line: UInt = #line) {
+        let result = actual as? MonkeyString
+        XCTAssertNotNil(result, file: file, line: line)
+        XCTAssertEqual(result?.value, expected, file: file, line: line)
     }
 
 }

@@ -147,6 +147,11 @@ class Compiler {
             let boolLiteral = node as! BooleanLiteral
             emit(op: boolLiteral.value ? .pushTrue : .pushFalse, operands: [])
 
+        case is StringLiteral:
+            let s = node as! StringLiteral
+            let str = MonkeyString(value: s.value)
+            emit(op: .constant, operands: [addConstant(obj: str)])
+
         default:
             ()
         }
