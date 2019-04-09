@@ -54,6 +54,7 @@
 		DC9FC1562257F8EF009D8FD4 /* VMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC1552257F8EF009D8FD4 /* VMTests.swift */; };
 		DC9FC1582257FCE0009D8FD4 /* vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC1572257FCE0009D8FD4 /* vm.swift */; };
 		DC9FC1592257FCE0009D8FD4 /* vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC1572257FCE0009D8FD4 /* vm.swift */; };
+		DC9FC15B225D2B06009D8FD4 /* frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC15A225D2B06009D8FD4 /* frame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +118,7 @@
 		DC99E3E622483BB300783E0C /* CompilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTests.swift; sourceTree = "<group>"; };
 		DC9FC1552257F8EF009D8FD4 /* VMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMTests.swift; sourceTree = "<group>"; };
 		DC9FC1572257FCE0009D8FD4 /* vm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vm.swift; sourceTree = "<group>"; };
+		DC9FC15A225D2B06009D8FD4 /* frame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = frame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +206,7 @@
 				DC99E3E322483A7F00783E0C /* compiler.swift */,
 				DC36FDAA225AC9EF00069BDA /* SymbolTable.swift */,
 				DC9FC1572257FCE0009D8FD4 /* vm.swift */,
+				DC9FC15A225D2B06009D8FD4 /* frame.swift */,
 			);
 			path = sources;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC99E3E02246FE4D00783E0C /* code.swift in Sources */,
+				DC9FC15B225D2B06009D8FD4 /* frame.swift in Sources */,
 				DC5DFBB2222B98670065253A /* Object.swift in Sources */,
 				DC9FC1592257FCE0009D8FD4 /* vm.swift in Sources */,
 				DC5DFBB1222B98670065253A /* Parser.swift in Sources */,

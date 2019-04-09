@@ -151,6 +151,68 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testCallingFunctionsWithoutArguments() {
+        let tests = [
+            VMTestCase(input: "let fivePlusTen = fn() { 5 + 10; }; fivePlusTen();",
+                       expected: 15),
+            VMTestCase(input: "let one = fn() { 1; }; let two = fn() { 2; }; one() + two()",
+                       expected: 3),
+            VMTestCase(input: "let a = fn() { 1 }; let b = fn() { a() + 1 }; let c = fn() { b() + 1 }; c();",
+                       expected: 3),
+        ]
+
+        runVMTests(tests)
+    }
+
+    func testCallingFunctionsWithReturnStatement() {
+        let tests = [
+            VMTestCase(input: """
+                        let earlyExit = fn() { return 99; 100; };
+                        earlyExit();
+                       """,
+                       expected: 99),
+            VMTestCase(input: """
+                        let earlyExit = fn() { return 99; return 100; };
+                        earlyExit();
+                       """,
+                       expected: 99),
+        ]
+
+        runVMTests(tests)
+    }
+
+    func testFunctionsWithoutReturnValue() {
+        let tests = [
+            VMTestCase(input: """
+                        let noReturn = fn() { };
+                        noReturn();
+                       """,
+                       expected: Null),
+            VMTestCase(input: """
+                        let noReturn = fn() { };
+                        let noReturnTwo = fn() { noReturn(); };
+                        noReturn();
+                        noReturnTwo();
+                       """,
+                       expected: Null),
+        ]
+
+        runVMTests(tests)
+    }
+
+    func testFirstClassFunctions() {
+        let tests = [
+            VMTestCase(input: """
+                        let returnsOne = fn() { 1; };
+                        let returnsOneReturner = fn() { returnsOne; };
+                        returnsOneReturner()();
+                       """,
+                       expected: 1),
+        ]
+
+        runVMTests(tests)
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!

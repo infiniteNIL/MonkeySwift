@@ -32,6 +32,9 @@ enum Opcode: UInt8 {
     case array
     case hash
     case index
+    case call
+    case returnValue
+    case `return`
 }
 
 struct Definition {
@@ -61,6 +64,9 @@ let definitions: [Opcode: Definition] = [
     .array:         Definition(name: "Array", operandWidths: [2]),
     .hash:          Definition(name: "Hash", operandWidths: [2]),
     .index:         Definition(name: "Index", operandWidths: []),
+    .call:          Definition(name: "Call", operandWidths: []),
+    .returnValue:   Definition(name: "ReturnValue", operandWidths: []),
+    .return:        Definition(name: "Return", operandWidths: []),
 ]
 
 func lookup(op: UInt8) -> Definition? {

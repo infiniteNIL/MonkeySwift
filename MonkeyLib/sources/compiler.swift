@@ -9,7 +9,7 @@
 import Foundation
 
 struct EmittedInstruction {
-    let opcode: Opcode
+    var opcode: Opcode
     let position: Int
 }
 
@@ -17,23 +17,55 @@ enum CompilerError: Error {
     case undefinedVariable(String)
 }
 
+struct CompilationScope {
+    var instructions: Instructions
+    var lastInstruction: EmittedInstruction?
+    var previousInstruction: EmittedInstruction?
+}
+
 class Compiler {
-    private var instructions: Instructions
     private var constants: [MonkeyObject]
-    private var lastInstruction: EmittedInstruction?
-    private var previousInstruction: EmittedInstruction?
     private(set) var symbolTable: SymbolTable
+    private(set) var scopes: [CompilationScope]
+    private(set) var scopeIndex: Int
 
     init() {
-        instructions = []
         constants = []
         symbolTable = SymbolTable()
+
+        let mainScope = CompilationScope(instructions: [],
+                                         lastInstruction: nil,
+                                         previousInstruction: nil)
+        scopes = [mainScope]
+        scopeIndex = 0
     }
 
     init(symbolTable: SymbolTable, constants: [MonkeyObject]) {
-        instructions = []
         self.constants = constants
         self.symbolTable = symbolTable
+        let mainScope = CompilationScope(instructions: [],
+                                         lastInstruction: nil,
+                                         previousInstruction: nil)
+        scopes = [mainScope]
+        scopeIndex = 0
+    }
+
+    func enterScope() {
+        let scope = CompilationScope(instructions: [],
+                                     lastInstruction: nil,
+                                     previousInstruction: nil)
+        scopes.append(scope)
+        scopeIndex += 1
+    }
+
+    @discardableResult
+    func leaveScope() -> Instructions {
+        let instructions = currentInstructions()
+
+        scopes = scopes.dropLast()
+        scopeIndex -= 1
+
+        return instructions
     }
     
     func compile(node: Node) throws {
@@ -99,16 +131,16 @@ class Compiler {
             try compile(node: ifExpr.condition)
             let jumpNotTruthyPos = emit(op: .jumpNotTruthy, operands: [9999])
             try compile(node: ifExpr.consequence)
-            if lastInstructionIsPop() {
+            if lastInstructionIs(op: .pop) {
                 removeLastPop()
             }
             let jumpPos = emit(op: .jump, operands: [9999])
-            let afterConsequencePos = instructions.count
+            let afterConsequencePos = currentInstructions().count
             changedOperand(opPos: Int(jumpNotTruthyPos), operand: afterConsequencePos)
 
             if let alt = ifExpr.alternative {
                 try compile(node: alt)
-                if lastInstructionIsPop() {
+                if lastInstructionIs(op: .pop) {
                     removeLastPop()
                 }
             }
@@ -116,7 +148,7 @@ class Compiler {
                 emit(op: .null, operands: [])
             }
 
-            let afterAlternativePos = instructions.count
+            let afterAlternativePos = currentInstructions().count
             changedOperand(opPos: Int(jumpPos), operand: afterAlternativePos)
 
         case is BlockStatement:
@@ -178,9 +210,46 @@ class Compiler {
             try compile(node: indexExpr.index)
             emit(op: .index, operands: [])
 
+        case is FunctionLiteral:
+            let fn = node as! FunctionLiteral
+            enterScope()
+
+            try compile(node: fn.body)
+
+            if lastInstructionIs(op: .pop) {
+                replaceLastPopWithReturn()
+            }
+
+            if !lastInstructionIs(op: .returnValue) {
+                emit(op: .return, operands: [])
+            }
+
+            let instructions = leaveScope()
+            let compiledFn = CompiledFunction(instructions: instructions)
+            emit(op: .constant, operands: [addConstant(obj: compiledFn)])
+
+        case is ReturnStatement:
+            let ret = node as! ReturnStatement
+            try compile(node: ret.returnValue!)
+            emit(op: .returnValue, operands: [])
+
+        case is CallExpression:
+            let call = node as! CallExpression
+            try compile(node: call.function)
+            emit(op: .call, operands: [])
+
         default:
             ()
         }
+    }
+
+    private func replaceLastPopWithReturn() {
+        guard let lastInstruction = scopes[scopeIndex].lastInstruction else {
+            fatalError("No last instruction")
+        }
+        let lastPos = lastInstruction.position
+        replaceInstruction(pos: lastPos, newInstruction: make(op: .returnValue, operands: []))
+        scopes[scopeIndex].lastInstruction?.opcode = .returnValue
     }
 
     private func findValue(key: Expression, in pairs: [(Expression, Expression)]) -> Expression {
@@ -191,7 +260,7 @@ class Compiler {
     }
 
     private func changedOperand(opPos: Int, operand: Int) {
-        guard let op = Opcode(rawValue: instructions[opPos]) else {
+        guard let op = Opcode(rawValue: currentInstructions()[opPos]) else {
             fatalError("Invalid opcode")
         }
         let newInstruction = make(op: op, operands: [UInt16(operand)])
@@ -199,23 +268,33 @@ class Compiler {
     }
 
     private func replaceInstruction(pos: Int, newInstruction: [UInt8]) {
+        var ins = currentInstructions()
+
         for i in 0..<newInstruction.count {
-            instructions[pos + i] = newInstruction[i]
+            ins[pos + i] = newInstruction[i]
         }
+
+        scopes[scopeIndex].instructions = ins
     }
 
-    private func lastInstructionIsPop() -> Bool {
-        return lastInstruction?.opcode == .pop
+    private func lastInstructionIs(op: Opcode) -> Bool {
+        guard currentInstructions().count > 0 else { return false }
+        return scopes[scopeIndex].lastInstruction?.opcode == op
     }
 
     private func removeLastPop() {
-        guard let last = lastInstruction else { fatalError("No last instruction") }
-        instructions = Array(instructions[..<last.position])
-        lastInstruction = previousInstruction
+        guard let last = scopes[scopeIndex].lastInstruction else { fatalError("No last instruction") }
+        let previous = scopes[scopeIndex].previousInstruction
+
+        let old = currentInstructions()
+        let new = Array(old[..<last.position])
+
+        scopes[scopeIndex].instructions = new
+        scopes[scopeIndex].lastInstruction = previous
     }
 
     func bytecode() -> Bytecode {
-        return Bytecode(instructions: instructions, constants: constants)
+        return Bytecode(instructions: currentInstructions(), constants: constants)
     }
 
     private func addConstant(obj: MonkeyObject) -> UInt16 {
@@ -232,16 +311,26 @@ class Compiler {
     }
 
     private func setLastInstruction(op: Opcode, pos: Int) {
-        previousInstruction = lastInstruction
-        lastInstruction = EmittedInstruction(opcode: op, position: Int(pos))
-
+        let previous = scopes[scopeIndex].lastInstruction
+        let last = EmittedInstruction(opcode: op, position: pos)
+        scopes[scopeIndex].previousInstruction = previous
+        scopes[scopeIndex].lastInstruction = last
     }
 
     private func addInstruction(_ ins: [UInt8]) -> UInt16 {
-        let posNewInstruction = instructions.count
-        instructions += ins
+        let posNewInstruction = currentInstructions().count
+
+        var updatedInstructions = currentInstructions()
+        updatedInstructions += ins
+
+        scopes[scopeIndex].instructions = updatedInstructions
         return UInt16(posNewInstruction)
     }
+
+    private func currentInstructions() -> Instructions {
+        return scopes[scopeIndex].instructions
+    }
+
 }
 
 struct Bytecode {

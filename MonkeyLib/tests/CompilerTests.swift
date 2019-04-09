@@ -377,6 +377,143 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testCompilerScopes() {
+        let compiler = Compiler()
+        XCTAssertEqual(compiler.scopeIndex, 0)
+
+        compiler.emit(op: .mul, operands: [])
+        compiler.enterScope()
+        XCTAssertEqual(compiler.scopeIndex, 1)
+
+        compiler.emit(op: .sub, operands: [])
+        XCTAssertEqual(compiler.scopes[compiler.scopeIndex].instructions.count, 1)
+
+        let last = compiler.scopes[compiler.scopeIndex].lastInstruction
+        XCTAssertEqual(last?.opcode, .sub)
+
+        compiler.leaveScope()
+        XCTAssertEqual(compiler.scopeIndex, 0)
+
+        compiler.emit(op: .add, operands: [])
+        XCTAssertEqual(compiler.scopes[compiler.scopeIndex].instructions.count, 2)
+
+        let last2 = compiler.scopes[compiler.scopeIndex].lastInstruction
+        XCTAssertEqual(last2?.opcode, .add)
+
+        let previous = compiler.scopes[compiler.scopeIndex].previousInstruction
+        XCTAssertEqual(previous?.opcode, .mul)
+    }
+
+    func testFunctions() {
+        let tests = [
+            Test(input: "fn() { return 5 + 10 }",
+                 expectedConstants: [
+                    5,
+                    10,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .constant, operands: [1]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: [])
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [2]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "fn() { 5 + 10 }",
+                 expectedConstants: [
+                    5,
+                    10,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .constant, operands: [1]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: [])
+                    ]
+                    ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [2]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "fn() { 1; 2 }",
+                 expectedConstants: [
+                    1,
+                    2,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .pop, operands: []),
+                        make(op: .constant, operands: [1]),
+                        make(op: .returnValue, operands: [])
+                    ]
+                    ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [2]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testFunctionsWithoutReturnValue() {
+        let tests = [
+            Test(input: "fn() { }",
+                 expectedConstants: [
+                    [
+                        make(op: .return, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testFunctionCalls() {
+        let tests = [
+            Test(input: "fn() { 24 }();",
+                 expectedConstants: [
+                    24,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [1]),
+                    make(op: .call, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "let noArg = fn() { 24 }; noArg();",
+                 expectedConstants: [
+                    24,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                    ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [1]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .call, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)
@@ -418,6 +555,11 @@ class CompilerTests: XCTestCase {
 
             case is String:
                 XCTAssertStringObject(constant as! String, actual[i])
+
+            case is [Instructions]:
+                let fn = actual[i] as? CompiledFunction
+                XCTAssertNotNil(fn, "constant \(i) is not a function: \(actual[i])")
+                XCTAssertInstructions(constant as! [Instructions], fn!.instructions)
 
             default:
                 XCTFail()

@@ -20,6 +20,7 @@ public enum MonkeyObjectType: String {
     case hashObj = "HASH"
     case quoteObj = "QUOTE"
     case macroObj = "MACRO"
+    case compiledFunctionObj = "COMPILED_FUNCTION_OBJ"
 }
 
 struct HashKey: Hashable {
@@ -239,5 +240,18 @@ struct MonkeyQuote: MonkeyObject {
 
     func inspect() -> String {
         return "QUOTE(" + node.description + ")"
+    }
+}
+
+struct CompiledFunction: MonkeyObject {
+    let instructions: Instructions
+
+    func type() -> MonkeyObjectType {
+        return .compiledFunctionObj
+    }
+
+    func inspect() -> String {
+        var s = self
+        return withUnsafePointer(to: &s) { "CompiledFunction[\($0)]" }
     }
 }

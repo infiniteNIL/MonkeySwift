@@ -10,6 +10,7 @@ import Foundation
 
 private let StackSize = 2048
 public let GlobalConstantsSize = 65536
+private let MaxFrames = 1024
 
 enum MonkeyVMError: Error {
     case stackOverflow
@@ -19,17 +20,23 @@ enum MonkeyVMError: Error {
 
 class MonkeyVM {
     private let constants: [MonkeyObject]
-    private let instructions: Instructions
     private var stack: [MonkeyObject]
     private var sp: Int // Always points to the next value. Top of stack is stack[sp-1]
     private(set) var globals: [MonkeyObject?]
+    private var frames: [Frame] = []
+    private var frameIndex: Int = 0
 
     init(bytecode: Bytecode) {
-        instructions = bytecode.instructions
         constants = bytecode.constants
         stack = [MonkeyObject](repeating: MonkeyNull(), count: StackSize)
         sp = 0
         globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
+
+        let mainFn = CompiledFunction(instructions: bytecode.instructions)
+        let mainFrame = Frame(fn: mainFn)
+
+        frames.append(mainFrame)
+        frameIndex = 1
     }
 
     convenience init(bytecode: Bytecode, globals: [MonkeyObject?]) {
@@ -37,22 +44,41 @@ class MonkeyVM {
         self.globals = globals
     }
 
+    private func currentFrame() -> Frame {
+        return frames[frameIndex - 1]
+    }
+
+    private func pushFrame(_ f: Frame) {
+        frames.append(f)
+        frameIndex += 1
+    }
+
+    @discardableResult
+    private func popFrame() -> Frame {
+        frameIndex -= 1
+        return frames.removeLast()
+    }
+
     func lastPopppedStackElem() -> MonkeyObject {
         return stack[sp]
     }
 
     func run() throws {
-        var ip = 0
-        while ip < instructions.count {
-            guard let op = Opcode(rawValue: instructions[ip]) else {
+        while currentFrame().ip < currentFrame().instructions().count - 1 {
+            currentFrame().ip += 1
+
+            let ip = self.currentFrame().ip
+            var ins = self.currentFrame().instructions()
+
+            guard let op = Opcode(rawValue: ins[ip]) else {
                 fatalError("Invalid opcode passed to VM")
             }
 
             switch op {
             case .constant:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let constIndex = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
                 try push(constants[constIndex])
 
             case .add, .sub, .mul, .div:
@@ -80,29 +106,29 @@ class MonkeyVM {
                 try executeMinusOperator()
 
             case .jumpNotTruthy:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let pos = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
                 let condition = pop()
                 if !isTruthy(condition) {
-                    ip = pos - 1
+                    currentFrame().ip = pos - 1
                 }
 
             case .jump:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let pos = Int(readUInt16(bytes))
-                ip = pos - 1
+                currentFrame().ip = pos - 1
 
             case .setGlobal:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let globalIndex = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
                 globals[globalIndex] = pop()
 
             case .getGlobal: ()
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let globalIndex = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
                 if let global = globals[globalIndex] {
                     try push(global)
                 }
@@ -111,18 +137,18 @@ class MonkeyVM {
                 }
 
             case .array:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let numElements = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
 
                 let array = buildArray(sp - numElements, sp)
                 sp = sp - numElements
                 try push(array)
 
             case .hash:
-                let bytes = Array(instructions[(ip + 1)...])
+                let bytes = Array(ins[(ip + 1)...])
                 let numElements = Int(readUInt16(bytes))
-                ip += 2
+                currentFrame().ip += 2
 
                 let hash = buildHash(sp - numElements, sp)
                 sp = sp - numElements
@@ -132,9 +158,25 @@ class MonkeyVM {
                 let index = pop()
                 let left = pop()
                 try executeIndexExpression(left, index)
-            }
 
-            ip += 1
+            case .call:
+                guard let fn = stack[sp - 1] as? CompiledFunction else {
+                    fatalError("CompiledFunction not on top of stack")
+                }
+                let frame = Frame(fn: fn)
+                pushFrame(frame)
+
+            case .returnValue:
+                let returnValue = pop()
+                popFrame()
+                pop()
+                try push(returnValue)
+
+            case .return:
+                popFrame()
+                pop()
+                try push(Null)
+            }
         }
     }
 
