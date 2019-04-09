@@ -381,7 +381,10 @@ class CompilerTests: XCTestCase {
         let compiler = Compiler()
         XCTAssertEqual(compiler.scopeIndex, 0)
 
+        let globalSymbolTable = compiler.symbolTable
+
         compiler.emit(op: .mul, operands: [])
+
         compiler.enterScope()
         XCTAssertEqual(compiler.scopeIndex, 1)
 
@@ -391,8 +394,13 @@ class CompilerTests: XCTestCase {
         let last = compiler.scopes[compiler.scopeIndex].lastInstruction
         XCTAssertEqual(last?.opcode, .sub)
 
+        XCTAssert(compiler.symbolTable.outer === globalSymbolTable)
+
         compiler.leaveScope()
         XCTAssertEqual(compiler.scopeIndex, 0)
+
+        XCTAssert(compiler.symbolTable === globalSymbolTable)
+        XCTAssertNil(compiler.symbolTable.outer)
 
         compiler.emit(op: .add, operands: [])
         XCTAssertEqual(compiler.scopes[compiler.scopeIndex].instructions.count, 2)
@@ -506,6 +514,63 @@ class CompilerTests: XCTestCase {
                     make(op: .setGlobal, operands: [0]),
                     make(op: .getGlobal, operands: [0]),
                     make(op: .call, operands: []),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testLetStatementScopes() {
+        let tests = [
+            Test(input: "let num = 55; fn() { num }",
+                 expectedConstants: [
+                    55,
+                    [
+                        make(op: .getGlobal, operands: [0]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "fn() { let num = 55; num }",
+                 expectedConstants: [
+                    55,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [1]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "fn() { let a = 55; let b = 77; a + b }",
+                 expectedConstants: [
+                    55,
+                    77,
+                    [
+                        make(op: .constant, operands: [0]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .constant, operands: [1]),
+                        make(op: .setLocal, operands: [1]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .getLocal, operands: [1]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [2]),
                     make(op: .pop, operands: []),
                 ]
             ),

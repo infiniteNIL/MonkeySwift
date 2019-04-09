@@ -35,6 +35,8 @@ enum Opcode: UInt8 {
     case call
     case returnValue
     case `return`
+    case getLocal
+    case setLocal
 }
 
 struct Definition {
@@ -67,6 +69,8 @@ let definitions: [Opcode: Definition] = [
     .call:          Definition(name: "Call", operandWidths: []),
     .returnValue:   Definition(name: "ReturnValue", operandWidths: []),
     .return:        Definition(name: "Return", operandWidths: []),
+    .getLocal:      Definition(name: "GetLocal", operandWidths: [1]),
+    .setLocal:      Definition(name: "SetLocal", operandWidths: [1]),
 ]
 
 func lookup(op: UInt8) -> Definition? {
@@ -91,6 +95,9 @@ func make(op: Opcode, operands: [UInt16]) -> [UInt8] {
     for (i, o) in operands.enumerated() {
         let width = def.operandWidths[i]
         switch width {
+        case 1:
+            instruction[offset] = UInt8(o)
+
         case 2:
             instruction[offset] = UInt8(o >> 8)
             instruction[offset + 1] = UInt8(o & 0x00ff)
@@ -146,8 +153,8 @@ func readOperands(def: Definition, ins: Instructions) -> ([Int], Int) {
 
     for (i, width) in def.operandWidths.enumerated() {
         switch width {
-        case 2:
-            operands[i] = Int(readUInt16(Array(ins[offset...])))
+        case 1: operands[i] = Int(readUInt8(Array(ins[offset...])))
+        case 2: operands[i] = Int(readUInt16(Array(ins[offset...])))
 
         default:
             break
@@ -157,6 +164,10 @@ func readOperands(def: Definition, ins: Instructions) -> ([Int], Int) {
     }
 
     return (operands, offset)
+}
+
+func readUInt8(_ ins: Instructions) -> UInt8 {
+    return UInt8(ins[0])
 }
 
 func readUInt16(_ ins: Instructions) -> UInt16 {

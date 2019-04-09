@@ -56,6 +56,8 @@ class Compiler {
                                      previousInstruction: nil)
         scopes.append(scope)
         scopeIndex += 1
+
+        symbolTable = SymbolTable(symbolTable)
     }
 
     @discardableResult
@@ -65,6 +67,7 @@ class Compiler {
         scopes = scopes.dropLast()
         scopeIndex -= 1
 
+        symbolTable = symbolTable.outer!
         return instructions
     }
     
@@ -161,14 +164,24 @@ class Compiler {
             let letStmt = node as! LetStatement
             try compile(node: letStmt.value!)
             let symbol = symbolTable.define(name: letStmt.name.value)
-            emit(op: .setGlobal, operands: [UInt16(symbol.index)])
+            if symbol.scope == .global {
+                emit(op: .setGlobal, operands: [UInt16(symbol.index)])
+            }
+            else {
+                emit(op: .setLocal, operands: [UInt16(symbol.index)])
+            }
 
         case is Identifier:
             let ident = node as! Identifier
             guard let symbol = symbolTable.resolve(name: ident.value) else {
                 throw CompilerError.undefinedVariable(ident.value)
             }
-            emit(op: .getGlobal, operands: [UInt16(symbol.index)])
+            if symbol.scope == .global {
+                emit(op: .getGlobal, operands: [UInt16(symbol.index)])
+            }
+            else {
+                emit(op: .getLocal, operands: [UInt16(symbol.index)])
+            }
 
         case is IntegerLiteral:
             let intLiteral = node as! IntegerLiteral
@@ -224,8 +237,9 @@ class Compiler {
                 emit(op: .return, operands: [])
             }
 
+            let numLocals = symbolTable.numDefinitions
             let instructions = leaveScope()
-            let compiledFn = CompiledFunction(instructions: instructions)
+            let compiledFn = CompiledFunction(instructions: instructions, numLocals: numLocals)
             emit(op: .constant, operands: [addConstant(obj: compiledFn)])
 
         case is ReturnStatement:

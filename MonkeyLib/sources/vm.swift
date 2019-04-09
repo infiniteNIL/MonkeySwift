@@ -32,8 +32,8 @@ class MonkeyVM {
         sp = 0
         globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
 
-        let mainFn = CompiledFunction(instructions: bytecode.instructions)
-        let mainFrame = Frame(fn: mainFn)
+        let mainFn = CompiledFunction(instructions: bytecode.instructions, numLocals: 0)
+        let mainFrame = Frame(fn: mainFn, basePointer: 0)
 
         frames.append(mainFrame)
         frameIndex = 1
@@ -163,19 +163,34 @@ class MonkeyVM {
                 guard let fn = stack[sp - 1] as? CompiledFunction else {
                     fatalError("CompiledFunction not on top of stack")
                 }
-                let frame = Frame(fn: fn)
+                let frame = Frame(fn: fn, basePointer: sp)
                 pushFrame(frame)
+                sp = frame.basePointer + fn.numLocals
 
             case .returnValue:
                 let returnValue = pop()
-                popFrame()
-                pop()
+                let frame = popFrame()
+                sp = frame.basePointer - 1
                 try push(returnValue)
 
             case .return:
-                popFrame()
-                pop()
+                let frame = popFrame()
+                sp = frame.basePointer - 1
                 try push(Null)
+
+            case .setLocal:
+                let bytes = Array(ins[(ip + 1)...])
+                let localIndex = readUInt8(bytes)
+                currentFrame().ip += 1
+                let frame = currentFrame()
+                stack[frame.basePointer + Int(localIndex)] = pop()
+
+            case .getLocal:
+                let bytes = Array(ins[(ip + 1)...])
+                let localIndex = readUInt8(bytes)
+                currentFrame().ip += 1
+                let frame = currentFrame()
+                try push(stack[frame.basePointer + Int(localIndex)])
             }
         }
     }

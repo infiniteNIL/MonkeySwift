@@ -208,6 +208,56 @@ class VMTests: XCTestCase {
                         returnsOneReturner()();
                        """,
                        expected: 1),
+            VMTestCase(input: """
+                        let returnsOneReturner = fn() {
+                          let returnsOne = fn() { 1; };
+                          returnsOne;
+                        };
+                        returnsOneReturner()();
+                       """,
+                       expected: 1),
+        ]
+
+        runVMTests(tests)
+    }
+
+    func testCallingFunctionsWithBindings() {
+        let tests = [
+            VMTestCase(input: """
+                        let one = fn() { let one = 1; one };
+                        one();
+                       """,
+                       expected: 1),
+            VMTestCase(input: """
+                        let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
+                        oneAndTwo();
+                       """,
+                       expected: 3),
+            VMTestCase(input: """
+                        let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
+                        let threeAndFour = fn() { let three = 3; let four = 4; three + four; };
+                        oneAndTwo() + threeAndFour();
+                       """,
+                       expected: 10),
+            VMTestCase(input: """
+                        let firstFoobar = fn() { let foobar = 50; foobar; };
+                        let secondFoobar = fn() { let foobar = 100; foobar; };
+                        firstFoobar() + secondFoobar();
+                       """,
+                       expected: 150),
+            VMTestCase(input: """
+                        let globalSeed = 50;
+                        let minusOne = fn() {
+                          let num = 1;
+                          globalSeed - num;
+                        }
+                        let minusTwo = fn() {
+                          let num = 2;
+                          globalSeed - num;
+                        }
+                        minusOne() + minusTwo();
+                       """,
+                       expected: 97),
         ]
 
         runVMTests(tests)
