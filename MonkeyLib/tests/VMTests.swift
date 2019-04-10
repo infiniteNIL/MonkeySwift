@@ -312,7 +312,7 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
-    private func testCallingFunctionsWithWrongArguments() {
+    func testCallingFunctionsWithWrongArguments() {
         let tests = [
             VMTestCase(input: "fn() { 1; }(1);",
                        expected: "wrong number of arguments: want=0, got=1"),
@@ -333,17 +333,36 @@ class VMTests: XCTestCase {
                 XCTFail("No VM error")
             }
             catch {
-                XCTAssert(error is MonkeyVMError)
-                if case MonkeyVMError.wrongNumberOfArguments = error {
-                }
-                else {
-                    XCTFail()
-                }
+                let error = error as? MonkeyVMError
+                XCTAssertNotNil(error)
+                XCTAssertEqual(error?.message, t.expected as? String)
             }
-
-            let stackElem = vm.lastPopppedStackElem()
-            testExpectedObject(t.expected, stackElem)
         }
+    }
+
+    func testBuiltinFunctions() {
+        let tests = [
+            VMTestCase(input: "len(\"\")", expected: 0),
+            VMTestCase(input: "len(\"four\")", expected: 4),
+            VMTestCase(input: "len(\"hello world\")", expected: 11),
+            VMTestCase(input: "len(1)", expected: ErrorValue(message: "argument to 'len' not supported. got INTEGER")),
+            VMTestCase(input: "len(\"one\", \"two\")", expected: ErrorValue(message: "wrong number of arguments. got=2, want=1")),
+            VMTestCase(input: "len([1, 2, 3])", expected: 3),
+            VMTestCase(input: "len([])", expected: 0),
+            VMTestCase(input: "puts(\"hello\", \"world\")", expected: Null),
+            VMTestCase(input: "first([1, 2, 3])", expected: 1),
+            VMTestCase(input: "first([])", expected: Null),
+            VMTestCase(input: "first(1)", expected: ErrorValue(message: "argument to 'first' must be ARRAY, got INTEGER")),
+            VMTestCase(input: "last([1, 2, 3])", expected: 3),
+            VMTestCase(input: "last([])", expected: Null),
+            VMTestCase(input: "last(1)", expected: ErrorValue(message: "argument to 'last' must be ARRAY, got INTEGER")),
+            VMTestCase(input: "rest([1, 2, 3])", expected: [2, 3]),
+            VMTestCase(input: "rest([])", expected: Null),
+            VMTestCase(input: "push([], 1)", expected: [1]),
+            VMTestCase(input: "push(1, 1)", expected: ErrorValue(message: "argument to 'push' must be ARRAY, got INTEGER")),
+        ]
+
+        runVMTests(tests)
     }
 
     private func runVMTests(_ tests: [VMTestCase]) {
@@ -394,6 +413,11 @@ class VMTests: XCTestCase {
                 XCTAssertNotNil(pair, "no pair given key in Pairs")
                 XCTAssertIntegerObject(Int64(expectedValue), pair!.value)
             }
+
+        case is ErrorValue:
+            let error = actual as? ErrorValue
+            XCTAssertNotNil(error, "object is not an ErrorValue")
+            XCTAssertEqual(error?.message, (expected as! ErrorValue).message)
 
         default:
             XCTFail()

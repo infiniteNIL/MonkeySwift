@@ -12,11 +12,8 @@ private let StackSize = 2048
 public let GlobalConstantsSize = 65536
 private let MaxFrames = 1024
 
-enum MonkeyVMError: Error {
-    case stackOverflow
-    case unsupportTypesForBinaryOperation(MonkeyObjectType, MonkeyObjectType)
-    case unknownStringOperator(UInt8)
-    case wrongNumberOfArguments(Int)
+struct MonkeyVMError: Error {
+    let message: String
 }
 
 class MonkeyVM {
@@ -164,7 +161,7 @@ class MonkeyVM {
                 let bytes = Array(ins[(ip + 1)...])
                 let numArgs = Int(readUInt8(bytes))
                 currentFrame().ip += 1
-                try callFunction(Int(numArgs))
+                try executeCall(Int(numArgs))
 
             case .returnValue:
                 let returnValue = pop()
@@ -192,23 +189,52 @@ class MonkeyVM {
                 try push(stack[frame.basePointer + Int(localIndex)])
 
             case .getBuiltin:
-                ()
+                let bytes = Array(ins[(ip + 1)...])
+                let builtinIndex = readUInt8(bytes)
+                currentFrame().ip += 1
+
+                let definition = Builtins[Int(builtinIndex)]
+                try push(definition.builtin)
             }
         }
     }
 
-    private func callFunction(_ numArgs: Int) throws {
-        guard let fn = stack[sp - 1 - numArgs] as? CompiledFunction else {
-            fatalError("CompiledFunction not on top of stack")
-        }
+    private func executeCall(_ numArgs: Int) throws {
+        let callee = stack[sp - 1 - numArgs]
 
+        switch callee {
+        case is CompiledFunction:
+            try callFunction(callee as! CompiledFunction, numArgs)
+
+        case is Builtin:
+            try callBuiltin(callee as! Builtin, numArgs)
+
+        default:
+            throw MonkeyVMError(message: "calling non-function and non-built-in")
+        }
+    }
+
+    private func callFunction(_ fn: CompiledFunction, _ numArgs: Int) throws {
         guard numArgs == fn.numParameters else {
-            throw MonkeyVMError.wrongNumberOfArguments(numArgs)
+            throw MonkeyVMError(message: "wrong number of arguments: want=\(fn.numParameters), got=\(numArgs)")
         }
 
         let frame = Frame(fn: fn, basePointer: sp - numArgs)
         pushFrame(frame)
         sp = frame.basePointer + fn.numLocals
+    }
+
+    private func callBuiltin(_ builtin: Builtin, _ numArgs: Int) throws {
+        let args = Array(stack[(sp - numArgs)..<sp])
+        let result = builtin.fn(args)
+        sp = sp - numArgs - 1
+
+        if let result = result {
+            try push(result)
+        }
+        else {
+            try push(Null)
+        }
     }
 
     private func executeIndexExpression(_ left: MonkeyObject, _ index: MonkeyObject) throws {
@@ -370,7 +396,7 @@ class MonkeyVM {
             try executeBinaryStringOperation(op, left, right)
         }
         else {
-            throw MonkeyVMError.unsupportTypesForBinaryOperation(leftType, rightType)
+            throw MonkeyVMError(message: "unsupported types for binary operation. left=\(leftType), right=\(rightType)")
         }
     }
 
@@ -392,7 +418,7 @@ class MonkeyVM {
     }
 
     private func executeBinaryStringOperation(_ op: Opcode, _ left: MonkeyObject, _ right: MonkeyObject) throws {
-        guard op == .add else { throw MonkeyVMError.unknownStringOperator(op.rawValue) }
+        guard op == .add else { throw MonkeyVMError(message: "unknown string operator: \(op.rawValue)") }
 
         let leftValue = (left as! MonkeyString).value
         let rightValue = (right as! MonkeyString).value
@@ -400,7 +426,7 @@ class MonkeyVM {
     }
 
     private func push(_ o: MonkeyObject) throws {
-        guard sp < StackSize else { throw MonkeyVMError.stackOverflow }
+        guard sp < StackSize else { throw MonkeyVMError(message: "stack overflow") }
 
         stack[sp] = o
         sp += 1

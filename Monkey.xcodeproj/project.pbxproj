@@ -55,6 +55,7 @@
 		DC9FC1582257FCE0009D8FD4 /* vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC1572257FCE0009D8FD4 /* vm.swift */; };
 		DC9FC1592257FCE0009D8FD4 /* vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC1572257FCE0009D8FD4 /* vm.swift */; };
 		DC9FC15B225D2B06009D8FD4 /* frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC15A225D2B06009D8FD4 /* frame.swift */; };
+		DCF96683225EADEC001EBDE9 /* frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9FC15A225D2B06009D8FD4 /* frame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -396,6 +397,7 @@
 				DC99E3DB2246E2D400783E0C /* macroExpansion.swift in Sources */,
 				DC99E3C8223C9D8300783E0C /* Builtins.swift in Sources */,
 				DC36FDAB225AC9EF00069BDA /* SymbolTable.swift in Sources */,
+				DCF96683225EADEC001EBDE9 /* frame.swift in Sources */,
 				DC9FC1582257FCE0009D8FD4 /* vm.swift in Sources */,
 				DC5DFB22222B62260065253A /* Object.swift in Sources */,
 				DC5DFBB622348B2C0065253A /* Environment.swift in Sources */,

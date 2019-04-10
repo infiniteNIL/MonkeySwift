@@ -32,7 +32,7 @@ private func first(_ args: [MonkeyObject]) -> MonkeyObject? {
     }
 
     guard args[0].type() == .arrayObj else {
-        return newError(message: "argument to 'first' must be ARRAY. got \(args[0].type())")
+        return newError(message: "argument to 'first' must be ARRAY, got \(args[0].type().rawValue)")
     }
 
     let arr = args[0] as! MonkeyArray
@@ -49,7 +49,7 @@ private func last(_ args: [MonkeyObject]) -> MonkeyObject? {
     }
 
     guard args[0].type() == .arrayObj else {
-        return newError(message: "argument to 'last' must be ARRAY. got \(args[0].type())")
+        return newError(message: "argument to 'last' must be ARRAY, got \(args[0].type().rawValue)")
     }
 
     let arr = args[0] as! MonkeyArray
@@ -85,7 +85,7 @@ private func push(_ args: [MonkeyObject]) -> MonkeyObject? {
     }
 
     guard args[0].type() == .arrayObj else {
-        return newError(message: "argument to 'push' must be ARRAY. got \(args[0].type())")
+        return newError(message: "argument to 'push' must be ARRAY, got \(args[0].type().rawValue)")
     }
 
     let arr = args[0] as! MonkeyArray
@@ -98,7 +98,7 @@ private func rest(_ args: [MonkeyObject]) -> MonkeyObject? {
     }
 
     guard args[0].type() == .arrayObj else {
-        return newError(message: "argument to 'rest' must be ARRAY. got \(args[0].type())")
+        return newError(message: "argument to 'rest' must be ARRAY, got \(args[0].type().rawValue)")
     }
 
     let arr = args[0] as! MonkeyArray

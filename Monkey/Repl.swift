@@ -16,6 +16,9 @@ func startREPL() {
     var constants = [MonkeyObject]()
     var globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
     var symbolTable = SymbolTable()
+    for (i, builtin) in Builtins.enumerated() {
+        symbolTable.defineBuiltin(i, builtin.name)
+    }
 
     while true {
         print(prompt, terminator: "")
