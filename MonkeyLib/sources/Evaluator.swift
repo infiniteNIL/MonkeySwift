@@ -11,6 +11,15 @@ public let True = MonkeyBoolean(value: true)
 public let False = MonkeyBoolean(value: false)
 public let Null = MonkeyNull()
 
+private var builtins: [String: Builtin] = [
+    "first": getBuiltinByName("first")!,
+    "last":  getBuiltinByName("last")!,
+    "len":   getBuiltinByName("len")!,
+    "push":  getBuiltinByName("push")!,
+    "puts":  getBuiltinByName("puts")!,
+    "rest":  getBuiltinByName("rest")!,
+]
+
 public func eval(_ node: Node, _ env: Environment) -> MonkeyObject? {
     switch node {
     case is Program:
@@ -326,7 +335,12 @@ private func applyFunction(_ fn: MonkeyObject?, _ args: [MonkeyObject]) -> Monke
         return unwrapReturnValue(evaluated)
 
     case is Builtin:
-        return (fn as! Builtin).fn(args)
+        if let result = (fn as! Builtin).fn(args) {
+            return result
+        }
+        else {
+            return Null
+        }
 
     default:
         return newError(message: "not a function: \(String(describing: fn?.type()))")

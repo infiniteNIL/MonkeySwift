@@ -8,14 +8,23 @@
 
 import Foundation
 
-var builtins: [String: Builtin] = [
-    "first":    Builtin(fn: first),
-    "last":     Builtin(fn: last),
-    "len":      Builtin(fn: len),
-    "push":     Builtin(fn: push),
-    "puts":     Builtin(fn: puts),
-    "rest":     Builtin(fn: rest),
+private struct BuiltinInfo {
+    let name: String
+    let builtin: Builtin
+}
+
+private var builtins: [BuiltinInfo] = [
+    BuiltinInfo(name: "first", builtin: Builtin(fn: first)),
+    BuiltinInfo(name: "last", builtin: Builtin(fn: last)),
+    BuiltinInfo(name: "len", builtin: Builtin(fn: len)),
+    BuiltinInfo(name: "push", builtin: Builtin(fn: push)),
+    BuiltinInfo(name: "puts", builtin: Builtin(fn: puts)),
+    BuiltinInfo(name: "rest", builtin: Builtin(fn: rest)),
 ]
+
+func getBuiltinByName(_ name: String) -> Builtin? {
+    return builtins.first(where: { $0.name == name })?.builtin
+}
 
 private func first(_ args: [MonkeyObject]) -> MonkeyObject? {
     guard args.count == 1 else {
@@ -31,7 +40,7 @@ private func first(_ args: [MonkeyObject]) -> MonkeyObject? {
         return arr.elements[0]
     }
 
-    return MonkeyNull()
+    return nil
 }
 
 private func last(_ args: [MonkeyObject]) -> MonkeyObject? {
@@ -48,7 +57,7 @@ private func last(_ args: [MonkeyObject]) -> MonkeyObject? {
         return arr.elements[arr.elements.count - 1]
     }
 
-    return MonkeyNull()
+    return nil
 }
 
 private func len(_ args: [MonkeyObject]) -> MonkeyObject? {
@@ -98,12 +107,12 @@ private func rest(_ args: [MonkeyObject]) -> MonkeyObject? {
         return MonkeyArray(elements: newElements)
     }
 
-    return MonkeyNull()
+    return nil
 }
 
 private func puts(_ args: [MonkeyObject]) -> MonkeyObject? {
     for arg in args {
         print(arg.inspect())
     }
-    return MonkeyNull()
+    return nil
 }
