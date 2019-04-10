@@ -37,6 +37,7 @@ enum Opcode: UInt8 {
     case `return`
     case getLocal
     case setLocal
+    case getBuiltin
 }
 
 struct Definition {
@@ -71,6 +72,7 @@ let definitions: [Opcode: Definition] = [
     .return:        Definition(name: "Return", operandWidths: []),
     .getLocal:      Definition(name: "GetLocal", operandWidths: [1]),
     .setLocal:      Definition(name: "SetLocal", operandWidths: [1]),
+    .getBuiltin:    Definition(name: "GetBuiltin", operandWidths: [1]),
 ]
 
 func lookup(op: UInt8) -> Definition? {

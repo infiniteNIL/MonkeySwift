@@ -8,22 +8,22 @@
 
 import Foundation
 
-private struct BuiltinInfo {
+struct BuiltinInfo {
     let name: String
     let builtin: Builtin
 }
 
-private var builtins: [BuiltinInfo] = [
+var Builtins: [BuiltinInfo] = [
+    BuiltinInfo(name: "len", builtin: Builtin(fn: len)),
+    BuiltinInfo(name: "puts", builtin: Builtin(fn: puts)),
     BuiltinInfo(name: "first", builtin: Builtin(fn: first)),
     BuiltinInfo(name: "last", builtin: Builtin(fn: last)),
-    BuiltinInfo(name: "len", builtin: Builtin(fn: len)),
-    BuiltinInfo(name: "push", builtin: Builtin(fn: push)),
-    BuiltinInfo(name: "puts", builtin: Builtin(fn: puts)),
     BuiltinInfo(name: "rest", builtin: Builtin(fn: rest)),
+    BuiltinInfo(name: "push", builtin: Builtin(fn: push)),
 ]
 
 func getBuiltinByName(_ name: String) -> Builtin? {
-    return builtins.first(where: { $0.name == name })?.builtin
+    return Builtins.first(where: { $0.name == name })?.builtin
 }
 
 private func first(_ args: [MonkeyObject]) -> MonkeyObject? {

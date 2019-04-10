@@ -621,6 +621,46 @@ class CompilerTests: XCTestCase {
         runCompilerTests(tests)
     }
 
+    func testBuiltins() {
+        let tests = [
+            Test(input: """
+                    len([]);
+                    push([], 1);
+                 """,
+                 expectedConstants: [
+                    1,
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .getBuiltin, operands: [0]),
+                    make(op: .array, operands: [0]),
+                    make(op: .call, operands: [1]),
+                    make(op: .pop, operands: []),
+                    make(op: .getBuiltin, operands: [5]),
+                    make(op: .array, operands: [0]),
+                    make(op: .constant, operands: [0]),
+                    make(op: .call, operands: [2]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "fn() { len([]) }",
+                 expectedConstants: [
+                    [
+                        make(op: .getBuiltin, operands: [0]),
+                        make(op: .array, operands: [0]),
+                        make(op: .call, operands: [1]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
     func runCompilerTests(_ tests: [Test]) {
         for t in tests {
             let program = parse(input: t.input)

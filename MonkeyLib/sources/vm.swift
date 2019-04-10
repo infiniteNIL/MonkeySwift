@@ -190,6 +190,9 @@ class MonkeyVM {
                 currentFrame().ip += 1
                 let frame = currentFrame()
                 try push(stack[frame.basePointer + Int(localIndex)])
+
+            case .getBuiltin:
+                ()
             }
         }
     }

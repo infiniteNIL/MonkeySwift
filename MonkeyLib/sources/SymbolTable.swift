@@ -11,6 +11,7 @@ import Foundation
 enum SymbolScope: String, Equatable {
     case global = "GLOBAL"
     case local = "LOCAL"
+    case builtin = "BUILTIN"
 }
 
 struct Symbol: Equatable {
@@ -24,6 +25,14 @@ class SymbolTable {
     private var store: [String: Symbol] = [:]
     private(set) var numDefinitions: Int = 0
 
+    convenience init() {
+        self.init(nil)
+    }
+
+    init(_ outer: SymbolTable?) {
+        self.outer = outer
+    }
+
     @discardableResult
     func define(name: String) -> Symbol {
         let symbol = Symbol(name: name,
@@ -34,15 +43,15 @@ class SymbolTable {
         return symbol
     }
 
+    @discardableResult
+    func defineBuiltin(_ index: Int, _ name: String) -> Symbol {
+        let symbol = Symbol(name: name, scope: .builtin, index: index)
+        store[name] = symbol
+        return symbol
+    }
+
     func resolve(name: String) -> Symbol? {
         return store[name] ?? outer?.resolve(name: name)
     }
 
-    convenience init() {
-        self.init(nil)
-    }
-
-    init(_ outer: SymbolTable?) {
-        self.outer = outer
-    }
 }

@@ -134,4 +134,29 @@ class SymbolTableTests: XCTestCase {
         }
     }
 
+    func testDefineResolveBuiltins() {
+        let global = SymbolTable()
+        let firstLocal = SymbolTable(global)
+        let secondLocal = SymbolTable(firstLocal)
+
+        let expected = [
+            Symbol(name: "a", scope: .builtin, index: 0),
+            Symbol(name: "c", scope: .builtin, index: 1),
+            Symbol(name: "e", scope: .builtin, index: 2),
+            Symbol(name: "f", scope: .builtin, index: 3),
+        ]
+
+        for (i, symbol) in expected.enumerated() {
+            global.defineBuiltin(i, symbol.name)
+        }
+
+        for table in [global, firstLocal, secondLocal] {
+            for sym in expected {
+                let result = table.resolve(name: sym.name)
+                XCTAssertNotNil(result, "name \(sym.name) is not resolvable")
+                XCTAssertEqual(result, sym, "expected \(sym.name) to resolve to \(sym), got=\(String(describing: result))")
+            }
+        }
+    }
+
 }

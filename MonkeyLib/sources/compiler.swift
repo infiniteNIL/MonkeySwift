@@ -29,20 +29,18 @@ class Compiler {
     private(set) var scopes: [CompilationScope]
     private(set) var scopeIndex: Int
 
-    init() {
-        constants = []
-        symbolTable = SymbolTable()
-
-        let mainScope = CompilationScope(instructions: [],
-                                         lastInstruction: nil,
-                                         previousInstruction: nil)
-        scopes = [mainScope]
-        scopeIndex = 0
+    convenience init() {
+        self.init(symbolTable: SymbolTable(), constants: [])
     }
 
     init(symbolTable: SymbolTable, constants: [MonkeyObject]) {
         self.constants = constants
         self.symbolTable = symbolTable
+
+        for (i, builtin) in Builtins.enumerated() {
+            symbolTable.defineBuiltin(i, builtin.name)
+        }
+
         let mainScope = CompilationScope(instructions: [],
                                          lastInstruction: nil,
                                          previousInstruction: nil)
@@ -176,12 +174,7 @@ class Compiler {
             guard let symbol = symbolTable.resolve(name: ident.value) else {
                 throw CompilerError.undefinedVariable(ident.value)
             }
-            if symbol.scope == .global {
-                emit(op: .getGlobal, operands: [UInt16(symbol.index)])
-            }
-            else {
-                emit(op: .getLocal, operands: [UInt16(symbol.index)])
-            }
+            loadSymbol(symbol)
 
         case is IntegerLiteral:
             let intLiteral = node as! IntegerLiteral
@@ -352,6 +345,15 @@ class Compiler {
         return scopes[scopeIndex].instructions
     }
 
+    private func loadSymbol(_ s: Symbol) {
+        let op: Opcode
+        switch s.scope {
+        case .global:   op = .getGlobal
+        case .local:    op = .getLocal
+        case .builtin:  op = .getBuiltin
+        }
+        emit(op: op, operands: [UInt16(s.index)])
+    }
 }
 
 struct Bytecode {
