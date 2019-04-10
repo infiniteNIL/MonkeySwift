@@ -497,7 +497,7 @@ class CompilerTests: XCTestCase {
                  ] as [Any],
                  expectedInstructions: [
                     make(op: .constant, operands: [1]),
-                    make(op: .call, operands: []),
+                    make(op: .call, operands: [0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -513,7 +513,49 @@ class CompilerTests: XCTestCase {
                     make(op: .constant, operands: [1]),
                     make(op: .setGlobal, operands: [0]),
                     make(op: .getGlobal, operands: [0]),
-                    make(op: .call, operands: []),
+                    make(op: .call, operands: [0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "let oneArg = fn(a) { a }; oneArg(24);",
+                 expectedConstants: [
+                    [
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    24,
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .call, operands: [1]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: "let manyArg = fn(a, b, c) { a; b; c}; manyArg(24, 25, 26);",
+                 expectedConstants: [
+                    [
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .pop, operands: []),
+                        make(op: .getLocal, operands: [1]),
+                        make(op: .pop, operands: []),
+                        make(op: .getLocal, operands: [2]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    24,
+                    25,
+                    26
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .constant, operands: [1]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .constant, operands: [3]),
+                    make(op: .call, operands: [3]),
                     make(op: .pop, operands: []),
                 ]
             ),

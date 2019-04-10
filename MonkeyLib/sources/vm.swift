@@ -16,6 +16,7 @@ enum MonkeyVMError: Error {
     case stackOverflow
     case unsupportTypesForBinaryOperation(MonkeyObjectType, MonkeyObjectType)
     case unknownStringOperator(UInt8)
+    case wrongNumberOfArguments(Int)
 }
 
 class MonkeyVM {
@@ -32,7 +33,7 @@ class MonkeyVM {
         sp = 0
         globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
 
-        let mainFn = CompiledFunction(instructions: bytecode.instructions, numLocals: 0)
+        let mainFn = CompiledFunction(instructions: bytecode.instructions, numLocals: 0, numParameters: 0)
         let mainFrame = Frame(fn: mainFn, basePointer: 0)
 
         frames.append(mainFrame)
@@ -160,12 +161,10 @@ class MonkeyVM {
                 try executeIndexExpression(left, index)
 
             case .call:
-                guard let fn = stack[sp - 1] as? CompiledFunction else {
-                    fatalError("CompiledFunction not on top of stack")
-                }
-                let frame = Frame(fn: fn, basePointer: sp)
-                pushFrame(frame)
-                sp = frame.basePointer + fn.numLocals
+                let bytes = Array(ins[(ip + 1)...])
+                let numArgs = Int(readUInt8(bytes))
+                currentFrame().ip += 1
+                try callFunction(Int(numArgs))
 
             case .returnValue:
                 let returnValue = pop()
@@ -193,6 +192,20 @@ class MonkeyVM {
                 try push(stack[frame.basePointer + Int(localIndex)])
             }
         }
+    }
+
+    private func callFunction(_ numArgs: Int) throws {
+        guard let fn = stack[sp - 1 - numArgs] as? CompiledFunction else {
+            fatalError("CompiledFunction not on top of stack")
+        }
+
+        guard numArgs == fn.numParameters else {
+            throw MonkeyVMError.wrongNumberOfArguments(numArgs)
+        }
+
+        let frame = Frame(fn: fn, basePointer: sp - numArgs)
+        pushFrame(frame)
+        sp = frame.basePointer + fn.numLocals
     }
 
     private func executeIndexExpression(_ left: MonkeyObject, _ index: MonkeyObject) throws {

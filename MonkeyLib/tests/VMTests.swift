@@ -263,6 +263,89 @@ class VMTests: XCTestCase {
         runVMTests(tests)
     }
 
+    func testCallingFunctionsWithArgumentsAndBindings() {
+        let tests = [
+            VMTestCase(input: """
+                        let identity = fn(a) { a; };
+                        identity(4);
+                       """,
+                       expected: 4),
+            VMTestCase(input: """
+                        let sum = fn(a, b) { a + b; };
+                        sum(1, 2);
+                       """,
+                       expected: 3),
+            VMTestCase(input: """
+                        let sum = fn(a, b) { let c = a + b; c; };
+                        sum(1, 2);
+                       """,
+                       expected: 3),
+            VMTestCase(input: """
+                        let sum = fn(a, b) { let c = a + b; c; };
+                        sum(1, 2) + sum(3, 4);
+                       """,
+                       expected: 10),
+            VMTestCase(input: """
+                        let sum = fn(a, b) { let c = a + b; c; };
+                        let outer = fn() {
+                          sum(1, 2) + sum(3, 4);
+                        };
+                        outer();
+                       """,
+                       expected: 10),
+            VMTestCase(input: """
+                        let globalNum = 10;
+
+                        let sum = fn(a, b) {
+                            let c = a + b;
+                            c + globalNum;
+                        };
+
+                        let outer = fn() {
+                          sum(1, 2) + sum(3, 4) + globalNum;
+                        };
+                        outer() + globalNum;
+                       """,
+                       expected: 50),
+        ]
+
+        runVMTests(tests)
+    }
+
+    private func testCallingFunctionsWithWrongArguments() {
+        let tests = [
+            VMTestCase(input: "fn() { 1; }(1);",
+                       expected: "wrong number of arguments: want=0, got=1"),
+            VMTestCase(input: "fn(a) { a; }();",
+                       expected: "wrong number of arguments: want=1, got=0"),
+            VMTestCase(input: "fn(a, b) { a + b; }(1);",
+                       expected: "wrong number of arguments: want=2, got=1"),
+        ]
+
+        for t in tests {
+            let program = parse(input: t.input)!
+            let comp = Compiler()
+            try? comp.compile(node: program)
+
+            let vm = MonkeyVM(bytecode: comp.bytecode())
+            do {
+                try vm.run()
+                XCTFail("No VM error")
+            }
+            catch {
+                XCTAssert(error is MonkeyVMError)
+                if case MonkeyVMError.wrongNumberOfArguments = error {
+                }
+                else {
+                    XCTFail()
+                }
+            }
+
+            let stackElem = vm.lastPopppedStackElem()
+            testExpectedObject(t.expected, stackElem)
+        }
+    }
+
     private func runVMTests(_ tests: [VMTestCase]) {
         for t in tests {
             let program = parse(input: t.input)!

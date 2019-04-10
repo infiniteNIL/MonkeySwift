@@ -226,7 +226,9 @@ class Compiler {
         case is FunctionLiteral:
             let fn = node as! FunctionLiteral
             enterScope()
-
+            for p in fn.parameters {
+                symbolTable.define(name: p.value)
+            }
             try compile(node: fn.body)
 
             if lastInstructionIs(op: .pop) {
@@ -239,7 +241,9 @@ class Compiler {
 
             let numLocals = symbolTable.numDefinitions
             let instructions = leaveScope()
-            let compiledFn = CompiledFunction(instructions: instructions, numLocals: numLocals)
+            let compiledFn = CompiledFunction(instructions: instructions,
+                                              numLocals: numLocals,
+                                              numParameters: fn.parameters.count)
             emit(op: .constant, operands: [addConstant(obj: compiledFn)])
 
         case is ReturnStatement:
@@ -250,7 +254,10 @@ class Compiler {
         case is CallExpression:
             let call = node as! CallExpression
             try compile(node: call.function)
-            emit(op: .call, operands: [])
+            for a in call.arguments {
+                try compile(node: a)
+            }
+            emit(op: .call, operands: [UInt16(call.arguments.count)])
 
         default:
             ()

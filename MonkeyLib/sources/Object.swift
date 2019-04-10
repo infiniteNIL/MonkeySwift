@@ -246,6 +246,7 @@ struct MonkeyQuote: MonkeyObject {
 struct CompiledFunction: MonkeyObject {
     let instructions: Instructions
     let numLocals: Int
+    let numParameters: Int
 
     func type() -> MonkeyObjectType {
         return .compiledFunctionObj

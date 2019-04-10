@@ -66,7 +66,7 @@ let definitions: [Opcode: Definition] = [
     .array:         Definition(name: "Array", operandWidths: [2]),
     .hash:          Definition(name: "Hash", operandWidths: [2]),
     .index:         Definition(name: "Index", operandWidths: []),
-    .call:          Definition(name: "Call", operandWidths: []),
+    .call:          Definition(name: "Call", operandWidths: [1]),
     .returnValue:   Definition(name: "ReturnValue", operandWidths: []),
     .return:        Definition(name: "Return", operandWidths: []),
     .getLocal:      Definition(name: "GetLocal", operandWidths: [1]),
