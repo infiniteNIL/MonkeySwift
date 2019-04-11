@@ -106,12 +106,14 @@ class ModifyTests: XCTestCase {
                                         parameters: [],
                                         body: BlockStatement(token: oneToken, statements: [
                                                 ExpressionStatement(token: oneToken, expression: one())
-                                            ])),
+                                            ]),
+                                        name: nil),
                  expected: FunctionLiteral(token: Token(type: .function, literal: "fn"),
                                            parameters: [],
                                            body: BlockStatement(token: twoToken, statements: [
                                                 ExpressionStatement(token: twoToken, expression: two())
-                                            ]))
+                                            ]),
+                                        name: nil)
             ),
 
             Test(input: ArrayLiteral(token: Token(type: .lbracket, literal: "["), elements: [one(), one()]),

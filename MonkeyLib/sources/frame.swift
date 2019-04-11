@@ -9,17 +9,17 @@
 import Foundation
 
 class Frame {
-    private let fn: CompiledFunction
+    let cl: Closure
     var ip: Int
     var basePointer: Int
 
-    init(fn: CompiledFunction, basePointer: Int) {
-        self.fn = fn
+    init(cl: Closure, basePointer: Int) {
+        self.cl = cl
         ip = -1
         self.basePointer = basePointer
     }
 
     func instructions() -> Instructions {
-        return fn.instructions
+        return cl.fn.instructions
     }
 }

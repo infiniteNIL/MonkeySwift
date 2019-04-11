@@ -27,7 +27,8 @@ class CodeTests: XCTestCase {
         let tests = [
             Test(op: .constant, operands: [65534], expected: [Opcode.constant.rawValue, 255, 254]),
             Test(op: .add, operands: [], expected: [Opcode.add.rawValue]),
-            Test(op: .getLocal, operands: [255], expected: [Opcode.getLocal.rawValue, 255])
+            Test(op: .getLocal, operands: [255], expected: [Opcode.getLocal.rawValue, 255]),
+            Test(op: .closure, operands: [65534, 255], expected: [Opcode.closure.rawValue, 255, 254, 255]),
         ]
 
         for t in tests {
@@ -45,13 +46,15 @@ class CodeTests: XCTestCase {
             make(op:. add, operands: []),
             make(op: .getLocal, operands: [1]),
             make(op: .constant, operands: [2]),
-            make(op: .constant, operands: [65535])
+            make(op: .constant, operands: [65535]),
+            make(op: .closure, operands: [65535, 255]),
         ]
         let expected = """
             0000 Add
             0001 GetLocal 1
             0003 Constant 2
-            0006 Constant 65535\n
+            0006 Constant 65535
+            0009 Closure 65535 255\n
             """
 
         var concatted = Instructions()
@@ -71,7 +74,8 @@ class CodeTests: XCTestCase {
 
         let tests = [
             Test(op: .constant, operands: [65535], bytesRead: 2),
-            Test(op: .getLocal, operands: [255], bytesRead: 1)
+            Test(op: .getLocal, operands: [255], bytesRead: 1),
+            Test(op: .closure, operands: [65535, 255], bytesRead: 3),
         ]
 
         for t in tests {

@@ -38,6 +38,9 @@ enum Opcode: UInt8 {
     case getLocal
     case setLocal
     case getBuiltin
+    case closure
+    case getFree
+    case currentClosure
 }
 
 struct Definition {
@@ -46,33 +49,36 @@ struct Definition {
 }
 
 let definitions: [Opcode: Definition] = [
-    .constant:      Definition(name: "Constant", operandWidths: [2]),
-    .add:           Definition(name: "Add", operandWidths: []),
-    .pop:           Definition(name: "Pop", operandWidths: []),
-    .sub:           Definition(name: "Sub", operandWidths: []),
-    .mul:           Definition(name: "Mul", operandWidths: []),
-    .div:           Definition(name: "Div", operandWidths: []),
-    .pushTrue:      Definition(name: "True", operandWidths: []),
-    .pushFalse:     Definition(name: "False", operandWidths: []),
-    .equal:         Definition(name: "Equal", operandWidths: []),
-    .notEqual:      Definition(name: "NotEqual", operandWidths: []),
-    .greaterThan:   Definition(name: "GreaterThan", operandWidths: []),
-    .minus:         Definition(name: "Minus", operandWidths: []),
-    .bang:          Definition(name: "Bang", operandWidths: []),
-    .jumpNotTruthy: Definition(name: "JumpNotTruthy", operandWidths: [2]),
-    .jump:          Definition(name: "Jump", operandWidths: [2]),
-    .null:          Definition(name: "Null", operandWidths: []),
-    .getGlobal:     Definition(name: "GetGlobal", operandWidths: [2]),
-    .setGlobal:     Definition(name: "SetGlobal", operandWidths: [2]),
-    .array:         Definition(name: "Array", operandWidths: [2]),
-    .hash:          Definition(name: "Hash", operandWidths: [2]),
-    .index:         Definition(name: "Index", operandWidths: []),
-    .call:          Definition(name: "Call", operandWidths: [1]),
-    .returnValue:   Definition(name: "ReturnValue", operandWidths: []),
-    .return:        Definition(name: "Return", operandWidths: []),
-    .getLocal:      Definition(name: "GetLocal", operandWidths: [1]),
-    .setLocal:      Definition(name: "SetLocal", operandWidths: [1]),
-    .getBuiltin:    Definition(name: "GetBuiltin", operandWidths: [1]),
+    .constant:       Definition(name: "Constant", operandWidths: [2]),
+    .add:            Definition(name: "Add", operandWidths: []),
+    .pop:            Definition(name: "Pop", operandWidths: []),
+    .sub:            Definition(name: "Sub", operandWidths: []),
+    .mul:            Definition(name: "Mul", operandWidths: []),
+    .div:            Definition(name: "Div", operandWidths: []),
+    .pushTrue:       Definition(name: "True", operandWidths: []),
+    .pushFalse:      Definition(name: "False", operandWidths: []),
+    .equal:          Definition(name: "Equal", operandWidths: []),
+    .notEqual:       Definition(name: "NotEqual", operandWidths: []),
+    .greaterThan:    Definition(name: "GreaterThan", operandWidths: []),
+    .minus:          Definition(name: "Minus", operandWidths: []),
+    .bang:           Definition(name: "Bang", operandWidths: []),
+    .jumpNotTruthy:  Definition(name: "JumpNotTruthy", operandWidths: [2]),
+    .jump:           Definition(name: "Jump", operandWidths: [2]),
+    .null:           Definition(name: "Null", operandWidths: []),
+    .getGlobal:      Definition(name: "GetGlobal", operandWidths: [2]),
+    .setGlobal:      Definition(name: "SetGlobal", operandWidths: [2]),
+    .array:          Definition(name: "Array", operandWidths: [2]),
+    .hash:           Definition(name: "Hash", operandWidths: [2]),
+    .index:          Definition(name: "Index", operandWidths: []),
+    .call:           Definition(name: "Call", operandWidths: [1]),
+    .returnValue:    Definition(name: "ReturnValue", operandWidths: []),
+    .return:         Definition(name: "Return", operandWidths: []),
+    .getLocal:       Definition(name: "GetLocal", operandWidths: [1]),
+    .setLocal:       Definition(name: "SetLocal", operandWidths: [1]),
+    .getBuiltin:     Definition(name: "GetBuiltin", operandWidths: [1]),
+    .closure:        Definition(name: "Closure", operandWidths: [2, 1]),
+    .getFree:        Definition(name: "GetFree", operandWidths: [1]),
+    .currentClosure: Definition(name: "CurrentClosure", operandWidths: []),
 ]
 
 func lookup(op: UInt8) -> Definition? {
@@ -141,6 +147,7 @@ private func formatInstruction(_ def: Definition, _ operands: [Int]) -> String {
     switch operandCount {
     case 0: return def.name
     case 1: return "\(def.name) \(operands[0])"
+    case 2: return "\(def.name) \(operands[0]) \(operands[1])"
 
     default:
         break

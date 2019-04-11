@@ -121,7 +121,12 @@ public class Parser {
         guard expectPeek(.assign) else { return nil }
 
         nextToken()
-        let value = parseExpression(precedence: .lowest)
+        var value = parseExpression(precedence: .lowest)
+        if var f1 = value as? FunctionLiteral {
+            f1.name = name.value
+            value = f1
+        }
+
         if peekToken.type == .semicolon {
             nextToken()
         }
@@ -279,7 +284,7 @@ public class Parser {
 
         let body = parseBlockStatement()
 
-        return FunctionLiteral(token: token, parameters: parameters, body: body)
+        return FunctionLiteral(token: token, parameters: parameters, body: body, name: nil)
     }
 
     private func parseFunctionParameters() -> [Identifier]? {

@@ -352,6 +352,26 @@ class ParserTests: XCTestCase {
         XCTAssertInfixExpression(bodyStmt?.expression, "x", operator: "+", "y")
     }
 
+    func testFunctionLiteralWithName() {
+        let input = "let myFunction = fn() { };"
+        let lexer = Lexer(input: input)
+        let parser = Parser(lexer: lexer)
+        let prog = parser.parseProgram()
+        checkParserErrors(parser)
+
+        XCTAssertNotNil(prog)
+        guard let program = prog else { return }
+
+        XCTAssertEqual(program.statements.count, 1)
+        let stmt = program.statements[0] as? LetStatement
+        XCTAssertNotNil(stmt, "program.statements[0] is not LetStatement. got=\(program.statements[0])")
+
+        let function = stmt!.value as? FunctionLiteral
+        XCTAssertNotNil(function, "Expression is not a function literal")
+
+        XCTAssertEqual(function?.name, "myFunction", "function literal name wrong. want 'myFunction', got=\(String(describing: function?.name))")
+    }
+
     func testFunctionParameterPassing() {
         struct ParameterPassingTest {
             let input: String

@@ -12,6 +12,8 @@ enum SymbolScope: String, Equatable {
     case global = "GLOBAL"
     case local = "LOCAL"
     case builtin = "BUILTIN"
+    case free = "FREE"
+    case function = "FUNCTION"
 }
 
 struct Symbol: Equatable {
@@ -24,6 +26,7 @@ class SymbolTable {
     let outer: SymbolTable?
     private var store: [String: Symbol] = [:]
     private(set) var numDefinitions: Int = 0
+    private(set) var freeSymbols: [Symbol] = []
 
     convenience init() {
         self.init(nil)
@@ -50,8 +53,35 @@ class SymbolTable {
         return symbol
     }
 
+    @discardableResult
+    func defineFree(_ original: Symbol) -> Symbol {
+        freeSymbols.append(original)
+        let symbol = Symbol(name: original.name, scope: .free, index: freeSymbols.count - 1)
+        store[original.name] = symbol
+        return symbol
+    }
+
+    @discardableResult
+    func defineFunctionName(_ name: String) -> Symbol {
+        let symbol = Symbol(name: name, scope: .function, index: 0)
+        store[name] = symbol
+        return symbol
+    }
+
     func resolve(name: String) -> Symbol? {
-        return store[name] ?? outer?.resolve(name: name)
+        if let obj = store[name] {
+            return obj
+        }
+
+        guard let outer = outer else { return nil }
+        guard let obj = outer.resolve(name: name) else { return nil }
+
+        if obj.scope == .global || obj.scope == .builtin {
+            return obj
+        }
+
+        let free = defineFree(obj)
+        return free
     }
 
 }

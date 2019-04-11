@@ -204,6 +204,7 @@ struct FunctionLiteral: Expression {
     let token: Token
     var parameters: [Identifier]
     var body: BlockStatement
+    var name: String?
 
     func tokenLiteral() -> String {
         return token.literal
@@ -214,7 +215,7 @@ struct FunctionLiteral: Expression {
             .map { $0.description }
             .joined()
 
-        return "\(tokenLiteral())(\(params)) \(body)"
+        return "\(tokenLiteral())<\(name ?? "NoName")>(\(params)) \(body)"
     }
 }
 

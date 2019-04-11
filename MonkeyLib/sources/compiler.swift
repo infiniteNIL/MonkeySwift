@@ -160,8 +160,8 @@ class Compiler {
 
         case is LetStatement:
             let letStmt = node as! LetStatement
-            try compile(node: letStmt.value!)
             let symbol = symbolTable.define(name: letStmt.name.value)
+            try compile(node: letStmt.value!)
             if symbol.scope == .global {
                 emit(op: .setGlobal, operands: [UInt16(symbol.index)])
             }
@@ -219,6 +219,9 @@ class Compiler {
         case is FunctionLiteral:
             let fn = node as! FunctionLiteral
             enterScope()
+            if let name = fn.name {
+                symbolTable.defineFunctionName(name)
+            }
             for p in fn.parameters {
                 symbolTable.define(name: p.value)
             }
@@ -232,12 +235,19 @@ class Compiler {
                 emit(op: .return, operands: [])
             }
 
+            let freeSymbols = symbolTable.freeSymbols
             let numLocals = symbolTable.numDefinitions
             let instructions = leaveScope()
+
+            for s in freeSymbols {
+                loadSymbol(s)
+            }
+
             let compiledFn = CompiledFunction(instructions: instructions,
                                               numLocals: numLocals,
                                               numParameters: fn.parameters.count)
-            emit(op: .constant, operands: [addConstant(obj: compiledFn)])
+            let fnIndex = addConstant(obj: compiledFn)
+            emit(op: .closure, operands: [fnIndex, UInt16(freeSymbols.count)])
 
         case is ReturnStatement:
             let ret = node as! ReturnStatement
@@ -351,7 +361,13 @@ class Compiler {
         case .global:   op = .getGlobal
         case .local:    op = .getLocal
         case .builtin:  op = .getBuiltin
+        case .free:     op = .getFree
+
+        case .function:
+            emit(op: .currentClosure, operands: [])
+            return
         }
+        
         emit(op: op, operands: [UInt16(s.index)])
     }
 }

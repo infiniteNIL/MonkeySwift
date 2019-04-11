@@ -21,6 +21,7 @@ public enum MonkeyObjectType: String {
     case quoteObj = "QUOTE"
     case macroObj = "MACRO"
     case compiledFunctionObj = "COMPILED_FUNCTION_OBJ"
+    case closureObj = "CLOSURE"
 }
 
 struct HashKey: Hashable {
@@ -124,7 +125,7 @@ extension ReturnValue: MonkeyObject {
 
 }
 
-struct ErrorValue {
+struct ErrorValue: Error {
     let message: String
 }
 
@@ -255,5 +256,19 @@ struct CompiledFunction: MonkeyObject {
     func inspect() -> String {
         var s = self
         return withUnsafePointer(to: &s) { "CompiledFunction[\($0)]" }
+    }
+}
+
+struct Closure: MonkeyObject {
+    let fn: CompiledFunction
+    var free: [MonkeyObject]
+
+    func type() -> MonkeyObjectType {
+        return .closureObj
+    }
+
+    func inspect() -> String {
+        var s = self
+        return withUnsafePointer(to: &s) { "Closure[\($0)]" }
     }
 }

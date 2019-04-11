@@ -426,7 +426,7 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [2]),
+                    make(op: .closure, operands: [2, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -442,7 +442,7 @@ class CompilerTests: XCTestCase {
                     ]
                     ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [2]),
+                    make(op: .closure, operands: [2, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -458,7 +458,7 @@ class CompilerTests: XCTestCase {
                     ]
                     ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [2]),
+                    make(op: .closure, operands: [2, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -476,7 +476,7 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [0]),
+                    make(op: .closure, operands: [0, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -496,7 +496,7 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [1]),
+                    make(op: .closure, operands: [1, 0]),
                     make(op: .call, operands: [0]),
                     make(op: .pop, operands: []),
                 ]
@@ -510,7 +510,7 @@ class CompilerTests: XCTestCase {
                     ]
                     ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [1]),
+                    make(op: .closure, operands: [1, 0]),
                     make(op: .setGlobal, operands: [0]),
                     make(op: .getGlobal, operands: [0]),
                     make(op: .call, operands: [0]),
@@ -526,7 +526,7 @@ class CompilerTests: XCTestCase {
                     24,
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [0]),
+                    make(op: .closure, operands: [0, 0]),
                     make(op: .setGlobal, operands: [0]),
                     make(op: .getGlobal, operands: [0]),
                     make(op: .constant, operands: [1]),
@@ -549,7 +549,7 @@ class CompilerTests: XCTestCase {
                     26
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [0]),
+                    make(op: .closure, operands: [0, 0]),
                     make(op: .setGlobal, operands: [0]),
                     make(op: .getGlobal, operands: [0]),
                     make(op: .constant, operands: [1]),
@@ -577,7 +577,7 @@ class CompilerTests: XCTestCase {
                  expectedInstructions: [
                     make(op: .constant, operands: [0]),
                     make(op: .setGlobal, operands: [0]),
-                    make(op: .constant, operands: [1]),
+                    make(op: .closure, operands: [1, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -592,7 +592,7 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [1]),
+                    make(op: .closure, operands: [1, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -612,7 +612,7 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [2]),
+                    make(op: .closure, operands: [2, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
@@ -652,10 +652,200 @@ class CompilerTests: XCTestCase {
                     ]
                  ] as [Any],
                  expectedInstructions: [
-                    make(op: .constant, operands: [0]),
+                    make(op: .closure, operands: [0, 0]),
                     make(op: .pop, operands: []),
                 ]
             ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testClosures() {
+        let tests = [
+            Test(input: """
+                    fn(a) {
+                        fn(b) {
+                            a + b
+                        }
+                    }
+                 """,
+                 expectedConstants: [
+                    [
+                        make(op: .getFree, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    [
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .closure, operands: [0, 1]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .closure, operands: [1, 0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: """
+                    fn(a) {
+                        fn(b) {
+                            fn(c) {
+                                a + b + c
+                            }
+                        }
+                    };
+                 """,
+                 expectedConstants: [
+                    [
+                        make(op: .getFree, operands: [0]),
+                        make(op: .getFree, operands: [1]),
+                        make(op: .add, operands: []),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    [
+                        make(op: .getFree, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .closure, operands: [0, 2]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    [
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .closure, operands: [1, 1]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .closure, operands: [2, 0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+            Test(input: """
+                    let global = 55;
+
+                    fn() {
+                        let a = 66;
+
+                        fn() {
+                            let b = 77;
+
+                            fn() {
+                                let c = 88;
+
+                                global + a + b + c;
+                            }
+                        }
+                    }
+                 """,
+                 expectedConstants: [
+                    55,
+                    66,
+                    77,
+                    88,
+                    [
+                        make(op: .constant, operands: [3]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .getGlobal, operands: [0]),
+                        make(op: .getFree, operands: [0]),
+                        make(op: .add, operands: []),
+                        make(op: .getFree, operands: [1]),
+                        make(op: .add, operands: []),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .add, operands: []),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    [
+                        make(op: .constant, operands: [2]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .getFree, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .closure, operands: [4, 2]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    [
+                        make(op: .constant, operands: [1]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .closure, operands: [5, 1]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .constant, operands: [0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .closure, operands: [6, 0]),
+                    make(op: .pop, operands: []),
+                ]
+            ),
+        ]
+
+        runCompilerTests(tests)
+    }
+
+    func testRecursiveFunctions() {
+        let tests = [
+            Test(input: """
+                   let countDown = fn(x) { countDown(x - 1); }
+                   countDown(1);
+                 """,
+                 expectedConstants: [
+                    1,
+                    [
+                        make(op: .currentClosure, operands: []),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .constant, operands: [0]),
+                        make(op: .sub, operands: []),
+                        make(op: .call, operands: [1]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    1
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .closure, operands: [1, 0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .constant, operands: [2]),
+                    make(op: .call, operands: [1]),
+                    make(op: .pop, operands: []),
+                 ]),
+
+            Test(input: """
+                   let wrapper = fn() {
+                     let countDown = fn(x) { countDown(x - 1); };
+                     countDown(1);
+                   };
+                   wrapper();
+                 """,
+                 expectedConstants: [
+                    1,
+                    [
+                        make(op: .currentClosure, operands: []),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .constant, operands: [0]),
+                        make(op: .sub, operands: []),
+                        make(op: .call, operands: [1]),
+                        make(op: .returnValue, operands: []),
+                    ],
+                    1,
+                    [
+                        make(op: .closure, operands: [1, 0]),
+                        make(op: .setLocal, operands: [0]),
+                        make(op: .getLocal, operands: [0]),
+                        make(op: .constant, operands: [2]),
+                        make(op: .call, operands: [1]),
+                        make(op: .returnValue, operands: []),
+                    ]
+                 ] as [Any],
+                 expectedInstructions: [
+                    make(op: .closure, operands: [3, 0]),
+                    make(op: .setGlobal, operands: [0]),
+                    make(op: .getGlobal, operands: [0]),
+                    make(op: .call, operands: [0]),
+                    make(op: .pop, operands: []),
+                ])
         ]
 
         runCompilerTests(tests)

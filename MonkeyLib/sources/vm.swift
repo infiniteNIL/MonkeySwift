@@ -31,7 +31,8 @@ class MonkeyVM {
         globals = [MonkeyObject?](repeating: nil, count: GlobalConstantsSize)
 
         let mainFn = CompiledFunction(instructions: bytecode.instructions, numLocals: 0, numParameters: 0)
-        let mainFrame = Frame(fn: mainFn, basePointer: 0)
+        let mainClosure = Closure(fn: mainFn, free: [])
+        let mainFrame = Frame(cl: mainClosure, basePointer: 0)
 
         frames.append(mainFrame)
         frameIndex = 1
@@ -195,16 +196,52 @@ class MonkeyVM {
 
                 let definition = Builtins[Int(builtinIndex)]
                 try push(definition.builtin)
+
+            case .closure:
+                let bytes = Array(ins[(ip + 1)...])
+                let constIndex = readUInt16(bytes)
+                let moreBytes = Array(ins[(ip + 3)...])
+                let numFree = readUInt8(moreBytes)
+                currentFrame().ip += 3
+                try pushClosure(Int(constIndex), Int(numFree))
+
+            case .getFree:
+                let bytes = Array(ins[(ip + 1)...])
+                let freeIndex = readUInt8(bytes)
+                currentFrame().ip += 1
+
+                let currentClosure = currentFrame().cl
+                try push(currentClosure.free[Int(freeIndex)])
+
+            case .currentClosure:
+                let currentClosure = currentFrame().cl
+                try push(currentClosure)
             }
         }
+    }
+
+    private func pushClosure(_ constIndex: Int, _ numFree: Int) throws {
+        let constant = constants[constIndex]
+        guard let function = constant as? CompiledFunction else {
+            throw newError(message: "not a function: \(constant)")
+        }
+
+        var free = [MonkeyObject](repeating: Null, count: numFree)
+        for i in 0..<numFree {
+            free[i] = stack[sp - numFree + i]
+        }
+        sp -= numFree
+
+        let closure = Closure(fn: function, free: free)
+        try push(closure)
     }
 
     private func executeCall(_ numArgs: Int) throws {
         let callee = stack[sp - 1 - numArgs]
 
         switch callee {
-        case is CompiledFunction:
-            try callFunction(callee as! CompiledFunction, numArgs)
+        case is Closure:
+            try callClosure(callee as! Closure, numArgs)
 
         case is Builtin:
             try callBuiltin(callee as! Builtin, numArgs)
@@ -214,14 +251,14 @@ class MonkeyVM {
         }
     }
 
-    private func callFunction(_ fn: CompiledFunction, _ numArgs: Int) throws {
-        guard numArgs == fn.numParameters else {
-            throw MonkeyVMError(message: "wrong number of arguments: want=\(fn.numParameters), got=\(numArgs)")
+    private func callClosure(_ cl: Closure, _ numArgs: Int) throws {
+        guard numArgs == cl.fn.numParameters else {
+            throw MonkeyVMError(message: "wrong number of arguments: want=\(cl.fn.numParameters), got=\(numArgs)")
         }
 
-        let frame = Frame(fn: fn, basePointer: sp - numArgs)
+        let frame = Frame(cl: cl, basePointer: sp - numArgs)
         pushFrame(frame)
-        sp = frame.basePointer + fn.numLocals
+        sp = frame.basePointer + cl.fn.numLocals
     }
 
     private func callBuiltin(_ builtin: Builtin, _ numArgs: Int) throws {
