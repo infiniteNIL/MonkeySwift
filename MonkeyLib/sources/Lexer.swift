@@ -10,9 +10,15 @@ import Foundation
 
 public class Lexer {
     private let input: String
-    private var position: String.Index      // current position in input (points to current character)
-    private var readPosition: String.Index  // current reading position in input (after current character)
-    private var ch: Character? = nil        // current character under examination
+
+    /// current position in input (points to current character)
+    private var position: String.Index
+
+    /// current reading position in input (after current character)
+    private var readPosition: String.Index
+
+    /// current character under examination
+    private var ch: Character? = nil
 
     public init(input: String) {
         self.input = input
@@ -21,65 +27,73 @@ public class Lexer {
         readChar()
     }
 
-    public func nextToken() -> Token {
-        let token: Token
+    private func readChar() {
+        guard readPosition < input.endIndex else {
+            ch = nil
+            position = input.endIndex
+            readPosition = input.endIndex
+            return
+        }
 
+        ch = input[readPosition]
+        position = readPosition
+        readPosition = input.index(after: readPosition)
+    }
+
+    public func nextToken() -> Token {
         skipWhitespace()
+        guard let ch = ch else { return Token(.eof, "") }
+
+        let token: Token
 
         switch ch {
         case "=":
             if peekChar() == "=" {
                 readChar()
-                token = Token(type: .equal, literal: "==")
+                token = Token(.equal, "==")
             }
             else {
-                token = Token(type: .assign, literal: String(ch!))
+                token = Token(.assign, ch)
             }
 
-        case "+": token = Token(type: .plus, literal: String(ch!))
-        case "-": token = Token(type: .minus, literal: String(ch!))
+        case "+": token = Token(.plus, ch)
+        case "-": token = Token(.minus, ch)
 
         case "!":
             if peekChar() == "=" {
                 readChar()
-                token = Token(type: .notEqual, literal: "!=")
+                token = Token(.notEqual, "!=")
             }
             else {
-                token = Token(type: .bang, literal: String(ch!))
+                token = Token(.bang, ch)
             }
 
-        case "/": token = Token(type: .slash, literal: String(ch!))
-        case "*": token = Token(type: .asterisk, literal: String(ch!))
-        case ">": token = Token(type: .gt, literal: String(ch!))
-        case "<": token = Token(type: .lt, literal: String(ch!))
-        case ";": token = Token(type: .semicolon, literal: String(ch!))
-        case ",": token = Token(type: .comma, literal: String(ch!))
-        case "(": token = Token(type: .lparen, literal: String(ch!))
-        case ")": token = Token(type: .rparen, literal: String(ch!))
-        case "{": token = Token(type: .lbrace, literal: String(ch!))
-        case "}": token = Token(type: .rbrace, literal: String(ch!))
+        case "/": token = Token(.slash, ch)
+        case "*": token = Token(.asterisk, ch)
+        case ">": token = Token(.gt, ch)
+        case "<": token = Token(.lt, ch)
+        case ";": token = Token(.semicolon, ch)
+        case ",": token = Token(.comma, ch)
+        case "(": token = Token(.lparen, ch)
+        case ")": token = Token(.rparen, ch)
+        case "{": token = Token(.lbrace, ch)
+        case "}": token = Token(.rbrace, ch)
 
-        case "\"": token = Token(type: .string, literal: readString())
-
-        case "[": token = Token(type: .lbracket, literal: String(ch!))
-        case "]": token = Token(type: .rbracket, literal: String(ch!))
-        case ":": token = Token(type: .colon, literal: String(ch!))
-
-
-        case nil: token = Token(type: .eof, literal: "")
+        case "\"": token = Token(.string, readString())
+        case "[": token = Token(.lbracket, ch)
+        case "]": token = Token(.rbracket, ch)
+        case ":": token = Token(.colon, ch)
 
         default:
             if isLetter(ch) {
                 let identifier = readIdentifier()
-                token = Token(type: lookupIdentifier(identifier), literal: identifier)
-                return token
+                return Token(lookupIdentifier(identifier), identifier)
             }
             else if isDigit(ch) {
-                token = Token(type: .int, literal: readNumber())
-                return token
+                return Token(.int, readNumber())
             }
             else {
-                token = Token(type: .illegal, literal: String(ch!))
+                return Token(.illegal, ch)
             }
         }
 
@@ -87,67 +101,47 @@ public class Lexer {
         return token
     }
 
-    private func readChar() {
-        if readPosition >= input.endIndex {
-            ch = nil
-            position = input.endIndex
-            readPosition = input.endIndex
-        }
-        else {
-            ch = input[readPosition]
-            position = readPosition
-            readPosition = input.index(after: readPosition)
+    private func skipWhitespace() {
+        let whitespace: [Character] = [" ", "\t", "\n", "\r"]
+
+        while let ch = ch, whitespace.contains(ch) {
+            readChar()
         }
     }
 
     private func peekChar() -> Character? {
-        if readPosition >= input.endIndex {
-            return nil
-        }
-        else {
-            return input[readPosition]
-        }
-    }
-
-    private func readIdentifier() -> String {
-        let position = self.position
-        while isLetter(ch) {
-            readChar()
-        }
-        return String(input[position..<self.position])
-    }
-
-    private func isLetter(_ ch: Character?) -> Bool {
-        guard let ch = ch else { return false }
-        return "a" <= ch && ch <= "z" || "A" <= ch && ch <= "Z" || ch == "_"
-    }
-
-    private func skipWhitespace() {
-        while ch == " " || ch == "\t" || ch == "\n" || ch == "\r" {
-            readChar()
-        }
-    }
-
-    private func readNumber() -> String {
-        let position = self.position
-        while isDigit(ch) {
-            readChar()
-        }
-        return String(input[position..<self.position])
-    }
-
-    private func isDigit(_ ch: Character?) -> Bool {
-        guard let ch = ch else { return false }
-        return "0" <= ch && ch <= "9"
+        guard readPosition < input.endIndex else { return nil }
+        return input[readPosition]
     }
 
     private func readString() -> String {
         let position = input.index(after: self.position)
-        while true {
+        repeat {
             readChar()
-            if ch == "\"" || ch == nil {
-                break
-            }
+        } while ch != "\"" && ch != nil
+        return String(input[position..<self.position])
+    }
+
+    private func isLetter(_ ch: Character) -> Bool {
+        return ch.isLetter || ch == "_"
+    }
+
+    private func readIdentifier() -> String {
+        let position = self.position
+        while let ch = ch, isLetter(ch) {
+            readChar()
+        }
+        return String(input[position..<self.position])
+    }
+
+    private func isDigit(_ ch: Character) -> Bool {
+        return ch.isASCII && ch.isWholeNumber
+    }
+
+    private func readNumber() -> String {
+        let position = self.position
+        while let ch = ch, isDigit(ch) {
+            readChar()
         }
         return String(input[position..<self.position])
     }

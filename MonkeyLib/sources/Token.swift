@@ -9,18 +9,29 @@
 import Foundation
 
 public struct Token {
-    public let type: TokenType
-    public var literal: String
+    let type: TokenType
+    var literal: String
+}
+
+extension Token {
+    init(_ type: TokenType, _ literal: String) {
+        self.type = type
+        self.literal = literal
+    }
+
+    init(_ type: TokenType, _ ch: Character) {
+        self.type = type
+        self.literal = String(ch)
+    }
 }
 
 public enum TokenType: String {
-    case illegal = "ILLEGAL"
-    case eof = "EOF"
+    case illegal
+    case eof
 
-    // Identifiers + literals
-    case ident = "IDENT"    // add, foobar, x, y, ...
-    case int = "INT"        // 123456
-    case string = "STRING"
+    case ident
+    case int
+    case string
 
     // Operators
     case assign = "="
@@ -48,14 +59,14 @@ public enum TokenType: String {
     case colon = ":"
 
     // Keywords
-    case function = "FUNCTION"
-    case `let` = "LET"
-    case `true` = "true"
-    case `false` = "false"
-    case `if` = "if"
-    case `else` = "else"
-    case `return` = "return"
-    case macro = "MACRO"
+    case function
+    case `let`
+    case `true`
+    case `false`
+    case `if`
+    case `else`
+    case `return`
+    case macro
 }
 
 let keywords: [String: TokenType] = [

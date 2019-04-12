@@ -192,12 +192,12 @@
 		DC5DFB17222B62250065253A /* sources */ = {
 			isa = PBXGroup;
 			children = (
+				DC5DFB1D222B62260065253A /* Token.swift */,
 				DC5DFB18222B62250065253A /* Lexer.swift */,
+				DC5DFB1B222B62260065253A /* Parser.swift */,
 				DC5DFB19222B62260065253A /* Evaluator.swift */,
 				DC5DFB1A222B62260065253A /* AST.swift */,
-				DC5DFB1B222B62260065253A /* Parser.swift */,
 				DC5DFB1C222B62260065253A /* Object.swift */,
-				DC5DFB1D222B62260065253A /* Token.swift */,
 				DC5DFBB422348B240065253A /* Environment.swift */,
 				DC99E3C7223C9D8300783E0C /* Builtins.swift */,
 				DC99E3D022432E9B00783E0C /* quoteUnquote.swift */,
@@ -215,9 +215,9 @@
 		DC5DFB24222B624C0065253A /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				DC5DFB25222B624C0065253A /* ASTTests.swift */,
-				DC5DFB28222B624C0065253A /* ParserTests.swift */,
 				DC5DFB29222B624C0065253A /* LexerTests.swift */,
+				DC5DFB28222B624C0065253A /* ParserTests.swift */,
+				DC5DFB25222B624C0065253A /* ASTTests.swift */,
 				DC5DFB2A222B624C0065253A /* EvaluatorTests.swift */,
 				DC99E3CA223EF95800783E0C /* ObjectTests.swift */,
 				DC99E3CE22432B9000783E0C /* quoteUnquoteTests.swift */,
