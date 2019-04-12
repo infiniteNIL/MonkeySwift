@@ -645,28 +645,28 @@ class ParserTests: XCTestCase {
         XCTAssertNotNil(expr as? Identifier, "expression is not an Identifier. Got \(String(describing: expr))", file: file, line: line)
         let ident = expr as! Identifier
         XCTAssertEqual(ident.value, value, "ident.value is not \(value), got \(ident.value)", file: file, line: line)
-        XCTAssertEqual(ident.tokenLiteral(), value, "identifier token literal is not \(value), got \(ident.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(ident.tokenLiteral, value, "identifier token literal is not \(value), got \(ident.tokenLiteral)", file: file, line: line)
     }
 
     func XCTAssertIntegerLiteral(_ expr: Expression?, _ value: Int, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(expr as? IntegerLiteral, "expression is not an integer, got \(String(describing: expr))", file: file, line: line)
         let integer = expr as! IntegerLiteral
         XCTAssertEqual(integer.value, value, "integer literal is not \(integer.value), got \(value)", file: file, line: line)
-        XCTAssertEqual(integer.tokenLiteral(), String(value), "integer token literal is not \(value), got \(integer.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(integer.tokenLiteral, String(value), "integer token literal is not \(value), got \(integer.tokenLiteral)", file: file, line: line)
     }
 
     func XCTAssertStringLiteral(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(expr as? StringLiteral, "expression is not a string, got \(String(describing: expr))", file: file, line: line)
         let string = expr as! StringLiteral
         XCTAssertEqual(string.value, value, "string literal is not \(string.value), got \(value)", file: file, line: line)
-        XCTAssertEqual(string.tokenLiteral(), String(value), "string token literal is not \(value), got \(string.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(string.tokenLiteral, String(value), "string token literal is not \(value), got \(string.tokenLiteral)", file: file, line: line)
     }
 
     func XCTAssertBooleanLiteral(_ expr: Expression?, _ value: Bool, file: StaticString = #file, line: UInt = #line) {
         XCTAssertNotNil(expr as? BooleanLiteral, "expression is not a boolean, got \(String(describing: expr))", file: file, line: line)
         let b = expr as! BooleanLiteral
         XCTAssertEqual(b.value, value, "boolean literal is not \(b.value), got \(value)", file: file, line: line)
-        XCTAssertEqual(b.tokenLiteral(), String(value), "boolean token literal is not \(value), got \(b.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(b.tokenLiteral, String(value), "boolean token literal is not \(value), got \(b.tokenLiteral)", file: file, line: line)
     }
 
     func XCTAssertLiteralExpression(_ expr: Expression, _ expected: Any, file: StaticString = #file, line: UInt = #line) {
@@ -694,11 +694,11 @@ class ParserTests: XCTestCase {
     }
 
     func XCTAssertLetStatement(_ s: Statement, _ name: String, file: StaticString = #file, line: UInt = #line) {
-        XCTAssertEqual(s.tokenLiteral(), "let", "s.tokenLiteral not 'let'. got \(s.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(s.tokenLiteral, "let", "s.tokenLiteral not 'let'. got \(s.tokenLiteral)", file: file, line: line)
         let letStmt = s as? LetStatement
         XCTAssertNotNil(letStmt, "s not LetStatement. got \(s)", file: file, line: line)
         XCTAssertEqual(letStmt?.name.value, name, "letStmt.Name.Value not '\(name)'. got \(letStmt!.name.value)", file: file, line: line)
-        XCTAssertEqual(letStmt?.name.tokenLiteral(), name, "letStmt.name.tokenLiteral() not '\(name)'. got \(letStmt!.name.tokenLiteral())", file: file, line: line)
+        XCTAssertEqual(letStmt?.name.tokenLiteral, name, "letStmt.name.tokenLiteral() not '\(name)'. got \(letStmt!.name.tokenLiteral)", file: file, line: line)
     }
 
 }

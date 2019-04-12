@@ -8,24 +8,21 @@
 import Foundation
 
 public protocol Node: CustomStringConvertible {
-    func tokenLiteral() -> String
+    var token: Token { get }
+    var tokenLiteral: String { get }
+}
+
+extension Node {
+    public var tokenLiteral: String { return token.literal }
 }
 
 protocol Statement: Node {}
-
 protocol Expression: Node {}
 
 public struct Program: Node {
     var statements: [Statement] = []
 
-    public func tokenLiteral() -> String {
-        if statements.count > 0 {
-            return statements[0].tokenLiteral()
-        }
-        else {
-            return ""
-        }
-    }
+    public var token: Token { return statements.first?.token ?? Token(.eof, "") }
 
     public var description: String {
         return statements
@@ -39,10 +36,6 @@ struct LetStatement: Statement {
     var name: Identifier
     var value: Expression?
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         let value = self.value?.description ?? ""
         return "\(token.literal) \(name) = \(value);"
@@ -53,10 +46,6 @@ struct Identifier: Expression {
     let token: Token
     let value: String
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         return value
     }
@@ -65,10 +54,6 @@ struct Identifier: Expression {
 struct ReturnStatement: Statement {
     let token: Token
     var returnValue: Expression?
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         let value = returnValue?.description ?? ""
@@ -80,10 +65,6 @@ struct ExpressionStatement: Statement, Expression {
     let token: Token
     var expression: Expression?
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         return expression?.description ?? ""
     }
@@ -92,10 +73,6 @@ struct ExpressionStatement: Statement, Expression {
 struct IntegerLiteral: Expression {
     var token: Token
     var value: Int
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         return token.literal
@@ -113,10 +90,6 @@ struct StringLiteral: Expression {
     let token: Token
     let value: String
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         return token.literal
     }
@@ -125,10 +98,6 @@ struct StringLiteral: Expression {
 struct BooleanLiteral: Expression {
     let token: Token
     let value: Bool
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         return token.literal
@@ -139,10 +108,6 @@ struct PrefixExpression: Expression {
     let token: Token
     let `operator`: String
     var right: Expression?
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         let right = self.right?.description ?? ""
@@ -156,10 +121,6 @@ struct InfixExpression: Expression {
     let `operator`: String
     var right: Expression?
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         let right = self.right?.description ?? ""
         return "(\(left) \(self.operator) \(right))"
@@ -171,10 +132,6 @@ struct IfExpression: Expression {
     var condition: Expression
     var consequence: BlockStatement
     var alternative: BlockStatement?
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         var result = "if \(condition) \(consequence)"
@@ -189,10 +146,6 @@ struct BlockStatement: Statement {
     let token: Token
     var statements: [Statement]
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         return statements
             .map { $0.description }
@@ -206,16 +159,12 @@ struct FunctionLiteral: Expression {
     var body: BlockStatement
     var name: String?
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         let params = parameters
             .map { $0.description }
             .joined()
 
-        return "\(tokenLiteral())<\(name ?? "NoName")>(\(params)) \(body)"
+        return "\(tokenLiteral)<\(name ?? "NoName")>(\(params)) \(body)"
     }
 }
 
@@ -223,10 +172,6 @@ struct CallExpression: Expression {
     let token: Token    // The '(' token
     let function: Expression
     let arguments: [Expression]
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         let args = arguments
@@ -241,10 +186,6 @@ struct ArrayLiteral: Expression {
     let token: Token
     var elements: [Expression]
 
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-
     var description: String {
         let elementsString = elements
             .map { String(describing: $0) }
@@ -257,10 +198,6 @@ struct IndexExpression: Expression {
     let token: Token    // The [
     var left: Expression
     var index: Expression
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
 
     var description: String {
         return "(" + left.description + "[" + index.description + "])"
@@ -279,8 +216,6 @@ struct HashLiteral: Expression {
 
         return "{" + pairStrings.joined(separator: ", ") + "}"
     }
-
-    func tokenLiteral() -> String { return token.literal }
 }
 
 struct MacroLiteral: Expression {
@@ -290,8 +225,6 @@ struct MacroLiteral: Expression {
 
     var description: String {
         let paramStrings = parameters.map { $0.description }
-        return "\(tokenLiteral()) (" + paramStrings.joined(separator: ", ") + ") + \(body.description)"
+        return "\(tokenLiteral) (" + paramStrings.joined(separator: ", ") + ") + \(body.description)"
     }
-
-    func tokenLiteral() -> String { return token.literal }
 }

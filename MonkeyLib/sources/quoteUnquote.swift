@@ -44,7 +44,7 @@ private func isUnquotedCall(_ node: Node) -> Bool {
         return false
     }
 
-    return callExpression.function.tokenLiteral() == "unquote"
+    return callExpression.function.tokenLiteral == "unquote"
 }
 
 private func convertObjectToASTNode(_ object: MonkeyObject) -> Node? {

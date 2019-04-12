@@ -97,7 +97,7 @@ public func eval(_ node: Node, _ env: Environment) -> MonkeyObject? {
 
     case is CallExpression:
         guard let node = node as? CallExpression else { return nil }
-        if node.function.tokenLiteral() == "quote" {
+        if node.function.tokenLiteral == "quote" {
             return quote(node.arguments[0], env)
         }
         
