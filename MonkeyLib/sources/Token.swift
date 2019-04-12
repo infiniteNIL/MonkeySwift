@@ -11,9 +11,7 @@ import Foundation
 public struct Token {
     let type: TokenType
     var literal: String
-}
 
-extension Token {
     init(_ type: TokenType, _ literal: String) {
         self.type = type
         self.literal = literal

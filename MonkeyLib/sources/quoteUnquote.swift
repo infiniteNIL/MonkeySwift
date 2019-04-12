@@ -51,17 +51,17 @@ private func convertObjectToASTNode(_ object: MonkeyObject) -> Node? {
     switch object {
     case is MonkeyInteger:
         let integer = object as! MonkeyInteger
-        let t = Token(type: .int, literal: "\(integer.value)")
+        let t = Token(.int, "\(integer.value)")
         return IntegerLiteral(token: t, value: integer.value)
 
     case is MonkeyBoolean:
         let b = object as! MonkeyBoolean
         let t: Token
         if b.value {
-            t = Token(type: .true, literal: "true")
+            t = Token(.true, "true")
         }
         else {
-            t = Token(type: .false, literal: "false")
+            t = Token(.false, "false")
         }
         return BooleanLiteral(token: t, value: b.value)
 

@@ -40,8 +40,8 @@ private let precedences: [TokenType: Precedence] = [
 
 public class Parser {
     private let lexer: Lexer
-    private var currentToken = Token(type: .eof, literal: "")
-    private var peekToken = Token(type: .eof, literal: "")
+    private var currentToken = Token(.eof, "")
+    private var peekToken = Token(.eof, "")
     private var prefixParseFns: [TokenType: PrefixParseFn] = [:]
     private var infixParseFns: [TokenType: InfixParseFn] = [:]
     public private(set) var errors: [String] = []

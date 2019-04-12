@@ -104,7 +104,7 @@ struct IntegerLiteral: Expression {
 
 extension IntegerLiteral {
     init(value: Int) {
-        self.token = Token(type: .int, literal: "\(value)")
+        self.token = Token(.int, "\(value)")
         self.value = value
     }
 }

@@ -13,13 +13,13 @@ class ASTTests: XCTestCase {
     func testCustomStringConvertible() {
         let program = Program(statements: [
             LetStatement(
-                token: Token(type: .let, literal: "let"),
+                token: Token(.let, "let"),
                 name: Identifier(
-                    token: Token(type: .ident, literal: "myVar"),
+                    token: Token(.ident, "myVar"),
                     value: "myVar"
                 ),
                 value: Identifier(
-                    token: Token(type: .ident, literal: "anotherVar"),
+                    token: Token(.ident, "anotherVar"),
                     value: "anotherVar"
                 )
             )

@@ -18,9 +18,9 @@ class ModifyTests: XCTestCase {
 
     func testModify() {
         let one = { return IntegerLiteral(value: 1) }
-        let oneToken = Token(type: .int, literal: "1")
+        let oneToken = Token(.int, "1")
         let two = { return IntegerLiteral(value: 2) }
-        let twoToken = Token(type: .int, literal: "2")
+        let twoToken = Token(.int, "2")
 
         let turnOneIntoTwo = { (node: Node) -> Node in
             guard var integer = node as? IntegerLiteral else { return node }
@@ -58,7 +58,7 @@ class ModifyTests: XCTestCase {
 
             Test(
                 input: IfExpression(
-                    token: Token(type: .if, literal: "if"),
+                    token: Token(.if, "if"),
                     condition: one(),
                     consequence: BlockStatement(
                         token: oneToken,
@@ -67,14 +67,14 @@ class ModifyTests: XCTestCase {
                         )]
                     ),
                     alternative: BlockStatement(
-                        token: Token(type: .else, literal: "else"),
+                        token: Token(.else, "else"),
                         statements: [ExpressionStatement(
                             token: oneToken, expression: one())
                         ]
                     )
                 ),
                 expected: IfExpression(
-                    token: Token(type: .if, literal: "if"),
+                    token: Token(.if, "if"),
                     condition: two(),
                     consequence: BlockStatement(
                         token: twoToken,
@@ -83,7 +83,7 @@ class ModifyTests: XCTestCase {
                         )]
                     ),
                     alternative: BlockStatement(
-                        token: Token(type: .else, literal: "else"),
+                        token: Token(.else, "else"),
                         statements: [ExpressionStatement(
                             token: twoToken, expression: two())
                         ]
@@ -102,13 +102,13 @@ class ModifyTests: XCTestCase {
                                          value: two())
             ),
 
-            Test(input: FunctionLiteral(token: Token(type: .function, literal: "fn"),
+            Test(input: FunctionLiteral(token: Token(.function, "fn"),
                                         parameters: [],
                                         body: BlockStatement(token: oneToken, statements: [
                                                 ExpressionStatement(token: oneToken, expression: one())
                                             ]),
                                         name: nil),
-                 expected: FunctionLiteral(token: Token(type: .function, literal: "fn"),
+                 expected: FunctionLiteral(token: Token(.function, "fn"),
                                            parameters: [],
                                            body: BlockStatement(token: twoToken, statements: [
                                                 ExpressionStatement(token: twoToken, expression: two())
@@ -116,12 +116,12 @@ class ModifyTests: XCTestCase {
                                         name: nil)
             ),
 
-            Test(input: ArrayLiteral(token: Token(type: .lbracket, literal: "["), elements: [one(), one()]),
-                 expected: ArrayLiteral(token: Token(type: .lbracket, literal: "["), elements: [two(), two()])),
+            Test(input: ArrayLiteral(token: Token(.lbracket, "["), elements: [one(), one()]),
+                 expected: ArrayLiteral(token: Token(.lbracket, "["), elements: [two(), two()])),
 
-            Test(input: HashLiteral(token: Token(type: .lbrace, literal: "{"),
+            Test(input: HashLiteral(token: Token(.lbrace, "{"),
                                     pairs: [(one(), one())]),
-                 expected: HashLiteral(token: Token(type: .lbrace, literal: "{"),
+                 expected: HashLiteral(token: Token(.lbrace, "{"),
                                        pairs: [(two(), two())])
             ),
         ]
