@@ -79,15 +79,15 @@ public class Parser {
         nextToken()
     }
 
-    func registerPrefix(tokenType: TokenType, fn: @escaping PrefixParseFn) {
+    private func registerPrefix(tokenType: TokenType, fn: @escaping PrefixParseFn) {
         prefixParseFns[tokenType] = fn
     }
 
-    func registerInfix(tokenType: TokenType, fn: @escaping InfixParseFn) {
+    private func registerInfix(tokenType: TokenType, fn: @escaping InfixParseFn) {
         infixParseFns[tokenType] = fn
     }
 
-    func nextToken() {
+    private func nextToken() {
         currentToken = peekToken
         peekToken = lexer.nextToken()
     }
@@ -134,7 +134,7 @@ public class Parser {
         return LetStatement(token: letToken, name: name, value: value)
     }
 
-    private func parseReturnStatement() -> ReturnStatement? {
+    private func parseReturnStatement() -> ReturnStatement {
         let token = currentToken
         nextToken()
 
@@ -176,7 +176,7 @@ public class Parser {
         return leftExpr
     }
 
-    func parseGroupedExpression() -> Expression? {
+    private func parseGroupedExpression() -> Expression? {
         nextToken()
 
         let expr = parseExpression(precedence: .lowest)
@@ -187,7 +187,7 @@ public class Parser {
         return expr
     }
 
-    func noPrefixParseFnError(tokenType: TokenType) {
+    private func noPrefixParseFnError(tokenType: TokenType) {
         let msg = "no prefix parse function for \(tokenType) found"
         errors.append(msg)
     }

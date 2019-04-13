@@ -10,34 +10,27 @@ import XCTest
 
 class ParserTests: XCTestCase {
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    struct ParserTest {
-        let expectedIdentifier: String
-    }
-
     func testLetStatements() {
-        struct LetTest {
+        struct Test {
             let input: String
             let expectedIdentifier: String
             let expectedValue: Any
+
+            init(_ input: String, _ identifier: String, _ value: Any) {
+                self.input = input
+                self.expectedIdentifier = identifier
+                self.expectedValue = value
+            }
         }
 
-        let tests: [LetTest] = [
-            LetTest(input: "let x = 5;", expectedIdentifier: "x", expectedValue: 5),
-            LetTest(input: "let y = true;", expectedIdentifier: "y", expectedValue: true),
-            LetTest(input: "let foobar = y;", expectedIdentifier: "foobar", expectedValue: "y"),
+        let tests = [
+            Test("let x = 5;", "x", 5),
+            Test("let y = true;", "y", true),
+            Test("let foobar = y;", "foobar", "y"),
         ]
 
-        tests.forEach { t in
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+        for t in tests {
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
             XCTAssertNotNil(program)
@@ -53,26 +46,25 @@ class ParserTests: XCTestCase {
         }
     }
 
-    func checkParserErrors(_ parser: Parser) {
-        parser.errors.forEach { print("parser error: \($0)") }
-        XCTAssertEqual(parser.errors.count, 0)
-    }
-
     func testReturnStatements() {
-        struct ReturnTest {
+        struct Test {
             let input: String
             let expectedValue: Any
+
+            init(_ input: String, _ value: Any) {
+                self.input = input
+                expectedValue = value
+            }
         }
 
-        let tests: [ReturnTest] = [
-            ReturnTest(input: "return 5;", expectedValue: 5),
-            ReturnTest(input: "return true;", expectedValue: true),
-            ReturnTest(input: "return y;", expectedValue: "y")
+        let tests = [
+            Test("return 5;", 5),
+            Test("return true;", true),
+            Test("return y;", "y")
         ]
 
         for t in tests {
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
             XCTAssertNotNil(program)
@@ -86,10 +78,7 @@ class ParserTests: XCTestCase {
     }
 
     func testIdentifierExpression() {
-        let input = "foobar;"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("foobar;")
         let program = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -102,9 +91,7 @@ class ParserTests: XCTestCase {
     }
 
     func testIntegerLiteral() {
-        let input = "5;"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("5;")
         let program = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -118,9 +105,7 @@ class ParserTests: XCTestCase {
     }
 
     func testStringLiteralExpression() {
-        let input = "\"hello world\";"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("\"hello world\";")
         let program = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -134,9 +119,7 @@ class ParserTests: XCTestCase {
     }
 
     func testBooleanLiteral() {
-        let input = "true;"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("true;")
         let program = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -150,22 +133,27 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingPrefixExpressions() {
-        struct PrefixTest {
+        struct Test {
             let input: String
             let `operator`: String
             let value: Any
+
+            init(_ input: String, _ op: String, _ value: Any) {
+                self.input = input
+                self.operator = op
+                self.value = value
+            }
         }
 
-        let prefixTests = [
-            PrefixTest(input: "!5", operator: "!", value: 5),
-            PrefixTest(input: "-15", operator: "-", value: 15),
-            PrefixTest(input: "!true", operator: "!", value: true),
-            PrefixTest(input: "!false", operator: "!", value: false),
+        let tests = [
+            Test("!5", "!", 5),
+            Test("-15", "-", 15),
+            Test("!true", "!", true),
+            Test("!false", "!", false),
         ]
 
-        prefixTests.forEach { t in
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+        for t in tests {
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
 
@@ -183,30 +171,36 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingInfixExpressions() {
-        struct InfixTest {
+        struct Test {
             let input: String
             let leftValue: Any
             let `operator`: String
             let rightValue: Any
+
+            init(_ input: String, _ left: Any, _ op: String, _ right: Any) {
+                self.input = input
+                leftValue = left
+                self.operator = op
+                rightValue = right
+            }
         }
 
-        let infixTests = [
-            InfixTest(input: "5 + 5", leftValue: 5, operator: "+", rightValue: 5),
-            InfixTest(input: "5 - 5", leftValue: 5, operator: "-", rightValue: 5),
-            InfixTest(input: "5 * 5", leftValue: 5, operator: "*", rightValue: 5),
-            InfixTest(input: "5 / 5", leftValue: 5, operator: "/", rightValue: 5),
-            InfixTest(input: "5 > 5", leftValue: 5, operator: ">", rightValue: 5),
-            InfixTest(input: "5 < 5", leftValue: 5, operator: "<", rightValue: 5),
-            InfixTest(input: "5 == 5", leftValue: 5, operator: "==", rightValue: 5),
-            InfixTest(input: "5 != 5", leftValue: 5, operator: "!=", rightValue: 5),
-            InfixTest(input: "true == true", leftValue: true, operator: "==", rightValue: true),
-            InfixTest(input: "true != false", leftValue: true, operator: "!=", rightValue: false),
-            InfixTest(input: "false == false", leftValue: false, operator: "==", rightValue: false),
+        let tests = [
+            Test("5 + 5", 5, "+", 5),
+            Test("5 - 5", 5, "-", 5),
+            Test("5 * 5", 5, "*", 5),
+            Test("5 / 5", 5, "/", 5),
+            Test("5 > 5", 5, ">", 5),
+            Test("5 < 5", 5, "<", 5),
+            Test("5 == 5", 5, "==", 5),
+            Test("5 != 5", 5, "!=", 5),
+            Test("true == true", true, "==", true),
+            Test("true != false", true, "!=", false),
+            Test("false == false", false, "==", false),
         ]
 
-        infixTests.forEach { t in
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+        for t in tests {
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
 
@@ -221,45 +215,49 @@ class ParserTests: XCTestCase {
     }
 
     func testOperatorPrecedenceParsing() {
-        struct PrecedenceTest {
+        struct Test {
             let input: String
             let expected: String
+
+            init(_ input: String, _ expected: String) {
+                self.input = input
+                self.expected = expected
+            }
         }
 
         let tests = [
-            PrecedenceTest(input: "-a * b", expected: "((-a) * b)"),
-            PrecedenceTest(input: "!-a", expected: "(!(-a))"),
-            PrecedenceTest(input: "a + b + c", expected: "((a + b) + c)"),
-            PrecedenceTest(input: "a + b - c", expected: "((a + b) - c)"),
-            PrecedenceTest(input: "a * b * c", expected: "((a * b) * c)"),
-            PrecedenceTest(input: "a * b / c", expected: "((a * b) / c)"),
-            PrecedenceTest(input: "a + b / c", expected: "(a + (b / c))"),
-            PrecedenceTest(input: "a + b * c + d / e - f", expected: "(((a + (b * c)) + (d / e)) - f)"),
-            PrecedenceTest(input: "3 + 4; -5 * 5", expected: "(3 + 4)((-5) * 5)"),
-            PrecedenceTest(input: "5 > 4 == 3 < 4", expected: "((5 > 4) == (3 < 4))"),
-            PrecedenceTest(input: "5 < 4 != 3 > 4", expected: "((5 < 4) != (3 > 4))"),
-            PrecedenceTest(input: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
-            PrecedenceTest(input: "true", expected: "true"),
-            PrecedenceTest(input: "false", expected: "false"),
-            PrecedenceTest(input: "3 > 5 == false", expected: "((3 > 5) == false)"),
-            PrecedenceTest(input: "3 < 5 == true", expected: "((3 < 5) == true)"),
-            PrecedenceTest(input: "1 + (2 + 3) + 4", expected: "((1 + (2 + 3)) + 4)"),
-            PrecedenceTest(input: "(5 + 5) * 2", expected: "((5 + 5) * 2)"),
-            PrecedenceTest(input: "2 / (5 + 5)", expected: "(2 / (5 + 5))"),
-            PrecedenceTest(input: "-(5 + 5)", expected: "(-(5 + 5))"),
-            PrecedenceTest(input: "!(true == true)", expected: "(!(true == true))"),
+            Test("-a * b", "((-a) * b)"),
+            Test("!-a", "(!(-a))"),
+            Test("a + b + c", "((a + b) + c)"),
+            Test("a + b - c", "((a + b) - c)"),
+            Test("a * b * c", "((a * b) * c)"),
+            Test("a * b / c", "((a * b) / c)"),
+            Test("a + b / c", "(a + (b / c))"),
+            Test("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"),
+            Test("3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"),
+            Test("5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"),
+            Test("5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"),
+            Test("3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
+            Test("true", "true"),
+            Test("false", "false"),
+            Test("3 > 5 == false", "((3 > 5) == false)"),
+            Test("3 < 5 == true", "((3 < 5) == true)"),
+            Test("1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"),
+            Test("(5 + 5) * 2", "((5 + 5) * 2)"),
+            Test("2 / (5 + 5)", "(2 / (5 + 5))"),
+            Test("-(5 + 5)", "(-(5 + 5))"),
+            Test("!(true == true)", "(!(true == true))"),
 
-            PrecedenceTest(input: "a + add(b * c) + d", expected: "((a + add((b * c))) + d)"),
-            PrecedenceTest(input: "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", expected: "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"),
-            PrecedenceTest(input: "add(a + b + c * d / f + g)", expected: "add((((a + b) + ((c * d) / f)) + g))"),
+            Test("a + add(b * c) + d", "((a + add((b * c))) + d)"),
+            Test("add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"),
+            Test("add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"),
 
-            PrecedenceTest(input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)"),
-            PrecedenceTest(input: "add(a * b[2], b[1], 2 * [1, 2][1])", expected: "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"),
+            Test("a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"),
+            Test("add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"),
         ]
 
-        tests.forEach { t in
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+        for t in tests {
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
 
@@ -270,9 +268,7 @@ class ParserTests: XCTestCase {
     }
 
     func testIfExpression() {
-        let input = "if (x < y) { x }"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("if (x < y) { x }")
         let prog = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -295,9 +291,7 @@ class ParserTests: XCTestCase {
     }
 
     func testIfElseExpression() {
-        let input = "if (x < y) { x } else { y }"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("if (x < y) { x } else { y }")
         let prog = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -324,9 +318,7 @@ class ParserTests: XCTestCase {
     }
 
     func testFunctionLiteral() {
-        let input = "fn(x, y) { x + y }"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("fn(x, y) { x + y }")
         let prog = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -353,9 +345,7 @@ class ParserTests: XCTestCase {
     }
 
     func testFunctionLiteralWithName() {
-        let input = "let myFunction = fn() { };"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("let myFunction = fn() { };")
         let prog = parser.parseProgram()
         checkParserErrors(parser)
 
@@ -373,20 +363,24 @@ class ParserTests: XCTestCase {
     }
 
     func testFunctionParameterPassing() {
-        struct ParameterPassingTest {
+        struct Test {
             let input: String
             let expectedParams: [String]
+
+            init(_ input: String, _ params: [String]) {
+                self.input = input
+                expectedParams = params
+            }
         }
 
-        let tests: [ParameterPassingTest] = [
-            ParameterPassingTest(input: "fn() {};", expectedParams: []),
-            ParameterPassingTest(input: "fn(x) {};", expectedParams: ["x"]),
-            ParameterPassingTest(input: "fn(x, y, z) {};", expectedParams: ["x", "y", "z"])
+        let tests = [
+            Test("fn() {};", []),
+            Test("fn(x) {};", ["x"]),
+            Test("fn(x, y, z) {};", ["x", "y", "z"])
         ]
 
-        tests.forEach { t in
-            let lexer = Lexer(input: t.input)
-            let parser = Parser(lexer: lexer)
+        for t in tests {
+            let parser = createParser(t.input)
             let program = parser.parseProgram()
             checkParserErrors(parser)
             XCTAssertNotNil(program)
@@ -403,9 +397,7 @@ class ParserTests: XCTestCase {
     }
 
     func testCallExpression() {
-        let input = "add(1, 2 * 3, 4 + 5);"
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("add(1, 2 * 3, 4 + 5);")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -427,10 +419,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingArrayLiterals() {
-        let input = "[1, 2 * 2, 3 + 3]"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("[1, 2 * 2, 3 + 3]")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -451,10 +440,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingIndexExpressions() {
-        let input = "myArray[1 + 1]"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("myArray[1 + 1]")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -472,10 +458,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingHashLiterals() {
-        let input = "{\"one\": 1, \"two\": 2, \"three\": 3}"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("{\"one\": 1, \"two\": 2, \"three\": 3}")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -500,10 +483,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingHashLiteralsWithIntegerKeys() {
-        let input = "{1: 1, 2: 2, 3: 3}"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("{1: 1, 2: 2, 3: 3}")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -528,10 +508,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingHashLiteralsWithBooleanKeys() {
-        let input = "{true: 1, false: 0}"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("{true: 1, false: 0}")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -556,10 +533,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingEmptyHashLiterals() {
-        let input = "{}"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("{}")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -576,10 +550,7 @@ class ParserTests: XCTestCase {
     }
 
     func testParsingHashLiteralsWithExpressions() {
-        let input = "{\"one\": 0 + 1, \"two\": 10 - 8, \"three\": 15 / 5}"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("{\"one\": 0 + 1, \"two\": 10 - 8, \"three\": 15 / 5}")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -613,10 +584,7 @@ class ParserTests: XCTestCase {
     }
 
     func testMacroLiteralParsing() {
-        let input = "macro(x, y) { x + y; }"
-
-        let lexer = Lexer(input: input)
-        let parser = Parser(lexer: lexer)
+        let parser = createParser("macro(x, y) { x + y; }")
         let program = parser.parseProgram()
         XCTAssertNotNil(program)
         checkParserErrors(parser)
@@ -639,6 +607,16 @@ class ParserTests: XCTestCase {
         XCTAssertNotNil(bodyStmt, "macro body stmt is not an ExpressionStmt")
 
         XCTAssertInfixExpression(bodyStmt!.expression, "x", operator: "+", "y")
+    }
+
+    private func createParser(_ input: String) -> Parser {
+        let lexer = Lexer(input: input)
+        return Parser(lexer: lexer)
+    }
+
+    func checkParserErrors(_ parser: Parser) {
+        parser.errors.forEach { print("parser error: \($0)") }
+        XCTAssertEqual(parser.errors.count, 0)
     }
 
     func XCTAssertIdentifier(_ expr: Expression?, _ value: String, file: StaticString = #file, line: UInt = #line) {
